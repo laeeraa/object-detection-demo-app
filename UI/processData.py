@@ -3,11 +3,11 @@
 #for openmmlab:
 import sys
 import os
-from mmdet.models.detectors.base import BaseDetector
+#from mmdet.models.detectors.base import BaseDetector
 scriptpath = "C:\cust\Studium_local\Studienprojekt\OpenMMLab\mmdetection"
 sys.path.append(os.path.abspath(scriptpath))
-from mmdet.apis import (async_inference_detector, inference_detector,
-                        init_detector)
+from mmdet.apis import (inference_detector,
+                        init_detector, DetInferencer)
 
 #for yolov4 with tensorflow: 
 import tensorflow as tf
@@ -15,58 +15,46 @@ from tf2_yolov4.anchors import YOLOV4_ANCHORS
 from tf2_yolov4.model import YOLOv4
 import matplotlib.pyplot as plt
 
+from ModelHandler import Model
+
 class ImageDet(): 
 
     def __init__(self, parent=None):
         #defs for the model
         self.imagepath=""
-        self.model=""
-        self.config="./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco.py"
-        self.checkpoint="./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth"
+        self.model= Model("YOLOV3", "./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco.py", "./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
         self.device="cpu"
         self.palette="coco"
         self.score_thr=float(0.3)
+        self.api = "Tensorflow"
 
 
     def changemodelconfig(self,model): 
         self.model = model
-        if(self.model == "Yolov3 with OpenMMLab"): 
-            self.config="./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco.py"
-            self.checkpoint="./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth"
+        if(self.model.name == "YOLOV3"): 
             self.score_thr=float(0.3)
-        elif(self.model == "Faster rcnn r50 with OpenMMLab"): 
-            self.config="./../OpenMMLab/mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py"
-            self.checkpoint="./../OpenMMLab/mmdetection/checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth"
-        elif(self.model == "Yolov4 with Tensorflow"): 
-            self.config="./"
-            self.checkpoint=" "  
+        elif(self.model.name == "Yolov4 with Tensorflow"): 
+            self.model.config="./"
+            self.model.checkpoint=" "  
 
     def processImage(self,image_path): 
-        if (self.model == "Yolov3 with OpenMMLab" or self.model == "Faster rcnn r50 with OpenMMLab"): 
-            return self.processImage_OpenMMLab(image_path)
-        elif (self.model == "Yolov4 with Tensorflow"): 
-            return self.processImage_tf_Yolov4(image_path)
+        if(self.api is not None and self.model.name is not ""):
+            if(self.api == "OpenMMLab"): 
+                return self.processImage_OpenMMLab(image_path)
+            elif (self.api == "Tensorflow"): 
+                return self.processImage_tf_Yolov4(image_path)
         else:
             return -1
 
     def processImage_OpenMMLab(self,image_path):
-        out_file="./../images/result.jpg"
-            # build the model from a config file and a checkpoint file
-        model = init_detector(self.config, self.checkpoint, self.device)
-            # test a single image
-        result = inference_detector(model,image_path)
-            # show the results
-        #res = BaseDetector.show_result(img, result, model.CLASSES, score_thr=0.3, wait_time=1)
-        #cv.imwrite(result_path, res)
-        # show_result_pyplot(
-        #         model,
-        #         image_path,
-        #         result,
-        #         self.score_thr,
-        #         'result',
-        #         0,
-        #         self.palette, 
-        #         out_file)
+        outFile="./../images/results/"
+        print("Configpath", self.model.configPath)
+        print("Weightspath", self.model.weightPath)
+
+        # build the model from a config file and a checkpoint file
+        inferencer = DetInferencer(model=self.model.configPath, weights=self.model.weightPath, device=self.device)
+        inferencer(out_dir=outFile, inputs=image_path)
+
         return 1 
 
     def processImage_tf_Yolov4(self, image_path):
@@ -90,6 +78,8 @@ class ImageDet():
         model.load_weights('./../Object_Detection/yolov4.h5')
         
         boxes, scores, classes, detections = model.predict(images)
+
+        imgname = os.path.basename(image_path)
         
         boxes = boxes[0] * [WIDTH, HEIGHT, WIDTH, HEIGHT]
         scores = scores[0]
@@ -123,11 +113,11 @@ class ImageDet():
                 text = CLASSES[class_idx] + ': {0:.2f}'.format(score)
                 ax.text(xmin, ymin, text, fontsize=9, bbox=dict(facecolor='yellow', alpha=0.6))
         
-        plt.savefig("./../images/result.jpg")
+        plt.axis('off')
+        plt.savefig("./../images/results/vis/"+imgname)
         plt.close()
         return detections
         #plt.title('Objects detected: {}'.format(detections))
-        #plt.axis('off')
         #plt.show()
 
 

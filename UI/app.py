@@ -37,18 +37,20 @@ sys.path.append(os.path.abspath(scriptpath))
 from hand_gesture_detection import VideoDetThread
 
 from processData import *
+from ModelHandler import ModelHandler
 
 class Window(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
 
         self.imageDet = ImageDet()
+        self.modelHandler = ModelHandler()
 
         super().__init__(parent)
         self.setupUi(self)
         self.connectSignalsSlots()
         self.loadImages()
-
+        self.initModelOptions()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -58,10 +60,20 @@ class Window(QMainWindow, Ui_MainWindow):
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
         self.combo_model.currentIndexChanged.connect(self.modelchanged)
+        self.combo_api.currentIndexChanged.connect(self.apichanged)
         self.btn_addImage.clicked.connect(self.addImage)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
-        
+    
+    #check which models exist in filepath and add those to dropdown 
+    def initModelOptions(self): 
+        self.combo_model.clear()
+        for m in self.modelHandler.models: 
+            self.combo_model.addItem(m.name)
+        self.combo_model.setCurrentIndex(-1)
+        self.combo_model.setCurrentText("Choose a model")
+        self.combo_api.setCurrentIndex(-1)
+        self.combo_api.setCurrentText("Choose an API")
 
     def openImageDetection(self):
         self.tabWidget.setCurrentIndex(1)
@@ -82,6 +94,7 @@ class Window(QMainWindow, Ui_MainWindow):
         dir.setNameFilters(filters)
         for filename in dir.entryList(): 
             self.list_filenames.addItem(filename)
+        
 
     def displayImageOrig(self): 
         path = "./../images/" + self.list_filenames.currentItem().text()
@@ -92,6 +105,7 @@ class Window(QMainWindow, Ui_MainWindow):
     def processImage(self): 
         #Bild in Funktion reinwerfen
         path = "./../images/" + self.list_filenames.currentItem().text()
+        self.list_status.addItem("processing Image...")
         ret = self.imageDet.processImage(path)
         if(ret>=0): 
             self.displayImageRes()
@@ -100,7 +114,7 @@ class Window(QMainWindow, Ui_MainWindow):
         
 
     def displayImageRes(self): 
-        path = "./../images/result.jpg"
+        path = "./../images/results/vis/" + self.list_filenames.currentItem().text()
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_res.setPixmap(self.convert_cv_qt(im_cv))
         self.list_status.addItem("trying to display Result image")
@@ -112,9 +126,13 @@ class Window(QMainWindow, Ui_MainWindow):
         Imagedialog.exec()
         
     def modelchanged(self): 
-        self.imageDet.changemodelconfig(self.combo_model.currentText())
+        self.imageDet.changemodelconfig(self.modelHandler.models[self.combo_model.currentIndex()])
         self.list_status.addItem("-model changed to " + self.combo_model.currentText())
-        
+    
+    def apichanged(self): 
+        self.imageDet.api = self.combo_api.currentText()
+        self.list_status.addItem("-API changed to " + self.combo_api.currentText())
+
     def addImage(self): 
         app = fileDialog(self)
         #app.openFileNamesDialog()
