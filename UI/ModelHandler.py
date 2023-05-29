@@ -4,8 +4,8 @@ import os
 class Model: 
     def __init__(self):
         self.name = ""
-        self.configPath = ""
-        self.weightPath = ""
+        self.configPath = "./../models/RTMDet\rtmdet_tiny_8xb32-300e_coco.py"
+        self.weightPath = "./../models/RTMDet\rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth"
 
     def __init__(self, name, configPath, weightPath):
         self.name = name

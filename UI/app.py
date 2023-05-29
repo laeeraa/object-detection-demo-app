@@ -105,6 +105,7 @@ class Window(QMainWindow, Ui_MainWindow):
     def processImage(self): 
         #Bild in Funktion reinwerfen
         path = "./../images/" + self.list_filenames.currentItem().text()
+
         self.list_status.addItem("processing Image...")
         ret = self.imageDet.processImage(path)
         if(ret>=0): 

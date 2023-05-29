@@ -3,11 +3,14 @@
 #for openmmlab:
 import sys
 import os
-#from mmdet.models.detectors.base import BaseDetector
+
+import numpy as np
 scriptpath = "C:\cust\Studium_local\Studienprojekt\OpenMMLab\mmdetection"
 sys.path.append(os.path.abspath(scriptpath))
 from mmdet.apis import (inference_detector,
                         init_detector, DetInferencer)
+
+from mmdet.evaluation import get_classes
 
 #for yolov4 with tensorflow: 
 import tensorflow as tf
@@ -26,7 +29,7 @@ class ImageDet():
         self.device="cpu"
         self.palette="coco"
         self.score_thr=float(0.3)
-        self.api = "Tensorflow"
+        self.api = "OpenMMLab"
 
 
     def changemodelconfig(self,model): 
@@ -53,9 +56,35 @@ class ImageDet():
 
         # build the model from a config file and a checkpoint file
         inferencer = DetInferencer(model=self.model.configPath, weights=self.model.weightPath, device=self.device)
-        inferencer(out_dir=outFile, inputs=image_path)
+        resultdict = inferencer(out_dir=outFile, inputs=image_path)
 
-        return 1 
+        objectsDetected = self.getPredTable(resultdict)
+
+        return objectsDetected
+    
+    def getPredTable(self, results): 
+        bbox_result = results["predictions"][0]["bboxes"]
+        labels = results["predictions"][0]["labels"]
+        scores = results["predictions"][0]["scores"]
+        classes = get_classes("coco")
+
+        predtable = list()
+        
+        i = 0
+        for s in scores: 
+            if(s > 0.3): 
+                pred = {
+                    "labelno": labels[i],
+                    "score": s,
+                    "labelclass": classes[labels[i]]
+                }
+                predtable.append(pred)
+            i+= 1
+        print(predtable)
+        return len(predtable)
+    
+
+
 
     def processImage_tf_Yolov4(self, image_path):
         WIDTH, HEIGHT = (1024, 768)
