@@ -6,42 +6,43 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1026</width>
-    <height>890</height>
+    <width>1550</width>
+    <height>923</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>DemonstrationNeuronalNetworks</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*
-	Copyright 2013 Emanuel Claesson
-
-	Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
-
-		http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
-
+   <string notr="true">
 /*
 	COLOR_DARK     = #191919
 	COLOR_MEDIUM   = #353535
 	COLOR_MEDLIGHT = #5A5A5A
 	COLOR_LIGHT    = #DDDDDD
 	COLOR_ACCENT   = #3D7848
+	
+	COLOR_BLUEDARK = #0F044C
+	COLOR_BLUELIGHT = #141E61
 */
+
+
 
 * {
 	background: #191919;
 	color: #DDDDDD;
 	border: 1px solid #5A5A5A;
+	border-radius: 5px; 
+	font: 11pt &quot;Segoe UI Semilight&quot;;
+}
+QLabel {
+	border: none; 
 }
 
 QWidget::item:selected {
@@ -302,11 +303,12 @@ QTextEdit {
 	font-weight:600;
 	 font-style:normal;
 }
-QPushButtont {
+QPushButton {
 	font-family:'Segoe UI Semilight'; 
-	font-size:9.75pt; 
-	font-weight:400;
-	 font-style:normal;
+	font-size:12pt; 
+	font-weight:800;
+	font-style:normal;
+	background: #0F044C;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -334,7 +336,7 @@ QPushButtont {
       <property name="minimumSize">
        <size>
         <width>500</width>
-        <height>500</height>
+        <height>0</height>
        </size>
       </property>
       <property name="currentIndex">
@@ -378,7 +380,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>video1.png</normaloff>video1.png</iconset>
+            <normaloff>assets/video1.png</normaloff>assets/video1.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -398,7 +400,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>webcam1.png</normaloff>webcam1.png</iconset>
+            <normaloff>assets/webcam1.png</normaloff>assets/webcam1.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -441,7 +443,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="icon">
            <iconset>
-            <normaloff>image1.png</normaloff>image1.png</iconset>
+            <normaloff>assets/image1.png</normaloff>assets/image1.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -512,47 +514,210 @@ p, li { white-space: pre-wrap; }
         <string>Image Detection</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="15" column="1">
-         <widget class="QLabel" name="lb_image_res">
+        <item row="6" column="1">
+         <widget class="QComboBox" name="combo_chooseDevice"/>
+        </item>
+        <item row="14" column="1">
+         <widget class="QComboBox" name="comboBox_3">
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <property name="placeholderText">
+           <string>choose weights</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QTextEdit" name="txt_ImageDet">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>600</width>
-            <height>400</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>1000</width>
-            <height>500</height>
+            <width>0</width>
+            <height>50</height>
            </size>
           </property>
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
             <pointsize>12</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
            </font>
           </property>
-          <property name="text">
-           <string/>
+          <property name="lineWidth">
+           <number>0</number>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI Semilight'; font-size:12pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:400;&quot;&gt;Image Detection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="0" colspan="2">
+         <widget class="QLineEdit" name="lineEdit_2"/>
+        </item>
+        <item row="17" column="0">
+         <widget class="QComboBox" name="comboBox_6"/>
+        </item>
+        <item row="14" column="0">
+         <widget class="QComboBox" name="combo_chooseUserModel">
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <property name="currentText">
+           <string notr="true"/>
+          </property>
+          <property name="placeholderText">
+           <string>choose model</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QComboBox" name="combo_model">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Choose device</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="1">
+         <widget class="QLineEdit" name="lineEdit_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Info </string>
+          </property>
+         </widget>
+        </item>
+        <item row="26" column="0">
+         <widget class="QPushButton" name="btn_addImage">
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
             <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
            </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Add data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="2">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Model Info</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QComboBox" name="combo_api">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Choose an API</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>OpenMMLab</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Tensorflow</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>upload weights</string>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Specify threshhold</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0" colspan="2">
+         <widget class="QLabel" name="label_10">
+          <property name="minimumSize">
+           <size>
+            <width>700</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>or use your own </string>
+          </property>
+         </widget>
+        </item>
+        <item row="22" column="0">
+         <widget class="QComboBox" name="comboBox_5"/>
+        </item>
+        <item row="10" column="0" colspan="2">
+         <widget class="QComboBox" name="combo_model">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+          <property name="placeholderText">
+           <string>Choose a model</string>
           </property>
           <item>
            <property name="text">
@@ -576,21 +741,37 @@ p, li { white-space: pre-wrap; }
           </item>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="QListWidget" name="list_filenames">
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>11</pointsize>
-           </font>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
+        <item row="16" column="1">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Specify batchsize</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="15" column="0">
+         <widget class="QPushButton" name="pushButton">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>upload model</string>
+          </property>
+         </widget>
+        </item>
+        <item row="26" column="1">
          <widget class="QPushButton" name="btn_process">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
@@ -606,82 +787,81 @@ font-size: 12
 </string>
           </property>
           <property name="text">
-           <string>Process Image</string>
+           <string>Process Data</string>
           </property>
          </widget>
         </item>
-        <item row="14" column="0">
-         <widget class="QTextEdit" name="textEdit_6">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI Semilight'; font-size:12pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:400;&quot;&gt;Original Image:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <item row="18" column="0" colspan="2">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Specify output directory</string>
           </property>
          </widget>
         </item>
-        <item row="14" column="1">
-         <widget class="QTextEdit" name="textEdit_7">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
+        <item row="21" column="1">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>or choose dataset</string>
           </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
+         </widget>
+        </item>
+        <item row="22" column="1">
+         <widget class="QComboBox" name="comboBox_8"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Choose an API</string>
           </property>
+         </widget>
+        </item>
+        <item row="14" column="2" rowspan="5">
+         <widget class="QTextEdit" name="textEdit"/>
+        </item>
+        <item row="9" column="0" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Choose a model </string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" rowspan="6">
+         <widget class="QListWidget" name="list_status"/>
+        </item>
+        <item row="21" column="0">
+         <widget class="QLabel" name="label_3">
           <property name="styleSheet">
            <string notr="true"/>
           </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI Semilight'; font-size:12pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9.75pt; font-weight:400;&quot;&gt;Processed Image:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="text">
+           <string>Choose images</string>
           </property>
          </widget>
         </item>
-        <item row="15" column="0">
+        <item row="19" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Original Image: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="21" column="2" rowspan="5">
          <widget class="QLabel" name="lb_image_orig">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>600</width>
-            <height>400</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>1000</width>
+            <width>700</width>
             <height>500</height>
            </size>
           </property>
@@ -693,55 +873,88 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QTextEdit" name="txt_ImageDet">
+        <item row="24" column="0" colspan="2">
+         <widget class="QListWidget" name="list_filenames">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
             <italic>false</italic>
-            <bold>true</bold>
+            <bold>false</bold>
            </font>
           </property>
           <property name="lineWidth">
            <number>0</number>
           </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI Semilight'; font-size:12pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:400;&quot;&gt;Image Detection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_Results">
+       <attribute name="title">
+        <string>Results</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Processed Image: </string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QTextEdit" name="textEdit_4">
+        <item>
+         <widget class="QLabel" name="lb_image_res">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>700</width>
+            <height>400</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
             <italic>false</italic>
-            <bold>true</bold>
+            <bold>false</bold>
            </font>
           </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI Semilight'; font-size:12pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9.75pt; font-weight:400;&quot;&gt;Choose a picture...&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="16" column="1">
+        <item>
          <widget class="QLineEdit" name="ln_ObjectCount">
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -749,48 +962,30 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="btn_addImage">
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <italic>false</italic>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
+        <item>
+         <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>Add Image from filesystem</string>
+           <string>Predictions Info</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0" rowspan="2">
-         <widget class="QListWidget" name="list_status"/>
+        <item>
+         <widget class="QTextEdit" name="txt_PredDump"/>
         </item>
-        <item row="6" column="0">
-         <widget class="QLineEdit" name="lineEdit">
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Image chosen: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="1">
+        <item>
          <widget class="QPushButton" name="btn_openImageDialog">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
-            <family>Segoe UI Semibold</family>
+            <family>Segoe UI Semilight</family>
             <pointsize>12</pointsize>
-            <weight>75</weight>
+            <weight>99</weight>
+            <italic>false</italic>
             <bold>true</bold>
            </font>
           </property>
@@ -798,19 +993,6 @@ p, li { white-space: pre-wrap; }
            <string>Open result in Dialog</string>
           </property>
          </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_VideoDet">
-       <attribute name="title">
-        <string>Video Detection</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_9">
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="textEdit"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QTextEdit" name="textEdit_2"/>
         </item>
        </layout>
       </widget>
@@ -825,9 +1007,10 @@ p, li { white-space: pre-wrap; }
            <widget class="QPushButton" name="btn_startWebcamDet">
             <property name="font">
              <font>
-              <family>Segoe UI Semibold</family>
+              <family>Segoe UI Semilight</family>
               <pointsize>12</pointsize>
-              <weight>75</weight>
+              <weight>99</weight>
+              <italic>false</italic>
               <bold>true</bold>
              </font>
             </property>
@@ -836,21 +1019,14 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="lb_webcam">
-            <property name="minimumSize">
-             <size>
-              <width>600</width>
-              <height>400</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QLabel" name="lb_webcamDet">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>600</width>
@@ -864,6 +1040,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="0" column="0" colspan="2">
            <widget class="QTextEdit" name="txt_WebcamHeading">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="html">
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -873,13 +1055,33 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lb_webcam">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>600</width>
+              <height>400</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0">
            <widget class="QPushButton" name="btn_startWebcam">
             <property name="font">
              <font>
-              <family>Segoe UI Semibold</family>
+              <family>Segoe UI Semilight</family>
               <pointsize>12</pointsize>
-              <weight>75</weight>
+              <weight>99</weight>
+              <italic>false</italic>
               <bold>true</bold>
              </font>
             </property>
@@ -896,7 +1098,10 @@ p, li { white-space: pre-wrap; }
             <property name="font">
              <font>
               <family>Segoe UI Semilight</family>
-              <pointsize>10</pointsize>
+              <pointsize>11</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
              </font>
             </property>
             <item>
@@ -919,6 +1124,20 @@ p, li { white-space: pre-wrap; }
               <string>OpenMMLab Video Detection FasterRCNN</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="btn_stopWebcam">
+            <property name="text">
+             <string>Stop Webcam</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="btn_stopWebcamDet">
+            <property name="text">
+             <string>Stop Detection</string>
+            </property>
            </widget>
           </item>
          </layout>
