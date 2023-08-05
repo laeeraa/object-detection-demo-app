@@ -24,7 +24,7 @@ class ModelHandler:
         self.getMMDetModels()
     
     def getMMDetModels(self): 
-        dir = "./../OpenMMLab/mmdetection/configs"
+        dir = "./OpenMMLab/mmdetection/configs"
         models = []
         for dir in os.scandir(dir):
             if dir.is_dir():
@@ -46,7 +46,7 @@ class ModelHandler:
                             self.models.append(Model(name = m['Name'], group = gruppe))
 
     def getModels(self): 
-        dir = "./../models/"
+        dir = "./models/"
         models = []
         #iterate over models in Model Directory
         for dir in os.scandir(dir):

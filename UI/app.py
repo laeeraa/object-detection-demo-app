@@ -14,7 +14,7 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
 
-scriptpath = ".\Qt"
+scriptpath = ".\\UI\\Qt"
 sys.path.append(os.path.abspath(scriptpath))
 from main_window_ui import Ui_MainWindow
 from image_large_ui import Ui_Dialog
@@ -26,6 +26,7 @@ from fileDialog import *
 
 #for webcam detection
 import numpy as np 
+from threading import Event
 
 scriptpath = "C:\cust\Studium_local\Studienprojekt\Hand_Gesture_Recognizer"
 sys.path.append(os.path.abspath(scriptpath))
@@ -41,6 +42,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.imageDet = ImageDet()
         self.modelHandler = ModelHandler()
+        self.stopHandGestureRecogEvent = Event()
 
         super().__init__(parent)
         self.setupUi(self)
@@ -63,6 +65,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.btn_addImage.clicked.connect(self.addImage)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
+        self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
     
     #check which models exist in filepath and add those to dropdown 
     def initModelOptions(self): 
@@ -148,9 +151,13 @@ class Window(QMainWindow, Ui_MainWindow):
         # start the thread
         self.thread.start()
 
+    def stopWebcam(self): 
+        self.thread.stop()
+
     def startHandGestureRecog(self): 
         #execute TechVidvan-hand_gesture_detection.py
         return 0    
+
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -160,12 +167,16 @@ class Window(QMainWindow, Ui_MainWindow):
     
 
     def startHandGestureRecog(self): 
+        self.stopHandGestureRecogEvent.clear()
         # create the video capture thread
-        self.thread = VideoDetThread()
+        self.thread = VideoDetThread(self.stopHandGestureRecogEvent)
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_imageDet)
         # start the thread
         self.thread.start()
+    
+    def stopHandGestureRecog(self):
+        self.thread.stop()
 
     @pyqtSlot(np.ndarray)
     def update_imageDet(self, cv_img):
@@ -210,14 +221,11 @@ class VideoThread(QThread):
 
 if __name__ == "__main__":
 
-    #QApplication.addLibraryPath(".")
     app = QApplication(sys.argv)
 
 
     win = Window()
-    win.resize(1800, 1000)
+    #win.resize(1800, 1000)
     win.show()
-
-
 
     sys.exit(app.exec())
