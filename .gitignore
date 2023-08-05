@@ -1,6 +1,16 @@
-Hand_Gesture_Recognizer/
-images/
-Object_Detection/
-Object_Detection2/
-OpenMMLab/
+app/packages/*
+data/*
 models/
+
+# python build output #
+__pycache__
+*.py[cod]
+*$py.class
+
+# Visual Studio Code # 
+.vscode/* 
+!.vscode/settings.json 
+!.vscode/tasks.json 
+!.vscode/launch.json 
+!.vscode/extensions.json 
+.history

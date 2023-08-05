@@ -1,12 +1,13 @@
+#source:  https://pythonspot.com/pyqt5-file-dialog/
+
+
 import sys
 import shutil
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
-
-
-class fileDialog(QDialog):
+class FileDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__()

@@ -1,5 +1,5 @@
-import sys
-import os
+
+from threading import Event
 import cv2
 
 from PyQt5.QtWidgets import (
@@ -13,35 +13,20 @@ from PyQt5.QtCore import(
 from PyQt5.uic import loadUi
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
+import numpy as np
+from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
+#from classes import ImageLarge, VideoThread
+from scripts.helpers import convert_cv_qt
 
-scriptpath = ".\\UI\\Qt"
-sys.path.append(os.path.abspath(scriptpath))
-from main_window_ui import Ui_MainWindow
-from image_large_ui import Ui_Dialog
+from qt import Ui_MainWindow
+import classes
 
-from helpers import convert_cv_qt
-
-#from processData import *
-from fileDialog import *
-
-#for webcam detection
-import numpy as np 
-from threading import Event
-
-scriptpath = "C:\cust\Studium_local\Studienprojekt\Hand_Gesture_Recognizer"
-sys.path.append(os.path.abspath(scriptpath))
-
-from hand_gesture_detection import VideoDetThread
-
-from processData import *
-from ModelHandler import ModelHandler
-
-class Window(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
 
-        self.imageDet = ImageDet()
-        self.modelHandler = ModelHandler()
+        self.imageDet = classes.ImageDet()
+        self.modelHandler = classes.ModelHandler()
         self.stopHandGestureRecogEvent = Event()
 
         super().__init__(parent)
@@ -137,7 +122,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.list_status.addItem("-API changed to " + self.combo_api.currentText())
 
     def addImage(self): 
-        app = fileDialog(self)
+        app = FileDialog(self)
         #app.openFileNamesDialog()
         app.exec()
         #sys.exit(app.exec_())
@@ -183,49 +168,3 @@ class Window(QMainWindow, Ui_MainWindow):
         """Updates the image_label with a new opencv image"""
         qt_img = convert_cv_qt(cv_img)
         self.lb_webcamDet.setPixmap(qt_img)
-    
-
-
-class ImageLarge(QDialog):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        loadUi("./Qt/imageLarge.ui", self)
-
-    def setImage(self, parent): 
-        path = "./../images/results/vis/" + parent.list_filenames.currentItem().text()
-        im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
-        print(im_cv.shape)
-        if(im_cv != []): 
-            self.lb_ImageLarge.setPixmap(convert_cv_qt(im_cv, width=1000, height=750))
-        else: 
-            parent.list_status.addItem("Picture cannot be displayed")
-
-        #Model sollte anders übergeben werden, Combo-Box könnte ja schon geändert sein 
-        self.ln_heading.setText("Processed Picture with " + parent.combo_model.currentText())
-        print("Set Image \n")
-
-
-class VideoThread(QThread):
-    change_pixmap_signal = pyqtSignal(np.ndarray)
-
-    def run(self):
-        # capture from web cam
-        cap = cv2.VideoCapture(0)
-        while True:
-            ret, cv_img = cap.read()
-            if ret:
-                self.change_pixmap_signal.emit(cv_img)
-
-
-
-if __name__ == "__main__":
-
-    app = QApplication(sys.argv)
-
-
-    win = Window()
-    #win.resize(1800, 1000)
-    win.show()
-
-    sys.exit(app.exec())

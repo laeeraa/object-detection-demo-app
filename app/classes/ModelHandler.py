@@ -1,22 +1,7 @@
-import sys
 import os
 import yaml
-
-class Model: 
-    def __init__(self):
-        self.group = ""
-        self.name = ""
-        self.configPath = None
-        self.weightPath = None
-        self.architecture = ""
-        self.tasks = ""
-
-    def __init__(self, name, configPath=None, weightPath=None, group=""):
-        self.name = name
-        self.configPath = configPath
-        self.weightPath = weightPath
-        self.group = group 
-
+from classes.Model import Model
+import constants.paths as paths
 
 class ModelHandler: 
     def __init__(self):
@@ -24,9 +9,8 @@ class ModelHandler:
         self.getMMDetModels()
     
     def getMMDetModels(self): 
-        dir = "./OpenMMLab/mmdetection/configs"
         models = []
-        for dir in os.scandir(dir):
+        for dir in os.scandir(paths.MMDET_MODELS):
             if dir.is_dir():
                 for file in os.scandir(dir.path): 
                     if file.is_file(): 
@@ -46,10 +30,8 @@ class ModelHandler:
                             self.models.append(Model(name = m['Name'], group = gruppe))
 
     def getModels(self): 
-        dir = "./models/"
-        models = []
         #iterate over models in Model Directory
-        for dir in os.scandir(dir):
+        for dir in os.scandir(paths.USER_MODELS):
             if dir.is_dir():
                 print(dir.path)
                 name = dir.name
