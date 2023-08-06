@@ -1,25 +1,20 @@
-
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QFileDialog, QLabel, QVBoxLayout
-)
+from PyQt5.QtWidgets import QMainWindow
 
 from PyQt5.QtCore import(
-    QDir, pyqtSignal, pyqtSlot, Qt, QThread
+    QDir, pyqtSlot
 )
 
-from PyQt5.uic import loadUi
-from PyQt5 import QtGui
 from PyQt5.QtGui import *
 import numpy as np
 from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
-#from classes import ImageLarge, VideoThread
 from scripts.helpers import convert_cv_qt
 
 from qt import Ui_MainWindow
 import classes
+import constants.paths as paths
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -37,11 +32,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
-        self.Btn_ImageDet_2.setIcon(QIcon("./assets/image1.png"))
+        self.Btn_ImageDet_2.setIcon(QIcon("./app/assets/image1.png"))
         self.Btn_VideoDet_2.clicked.connect(self.openVideoDetection)
-        self.Btn_VideoDet_2.setIcon(QIcon("./assets/video1.png"))
+        self.Btn_VideoDet_2.setIcon(QIcon("./app/assets/video1.png"))
         self.Btn_WebcamDet_2.clicked.connect(self.openWebcamDetection)
-        self.Btn_WebcamDet_2.setIcon(QIcon("./assets/webcam1.png"))
+        self.Btn_WebcamDet_2.setIcon(QIcon("./app/assets/webcam1.png"))
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
@@ -76,7 +71,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #clear list: 
         self.list_filenames.clear()
         #assume the directory exists and contains some files and you want all jpg and JPG files
-        dir = QDir("./../images")
+        dir = QDir(paths.IMAGES)
         filters = ["*.jpg", "*.JPG"]
         dir.setNameFilters(filters)
         for filename in dir.entryList(): 
@@ -84,14 +79,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
     def displayImageOrig(self): 
-        path = "./../images/" + self.list_filenames.currentItem().text()
+        path = paths.IMAGES + self.list_filenames.currentItem().text()
 
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
 
     def processImage(self): 
         #Bild in Funktion reinwerfen
-        path = "./../images/" + self.list_filenames.currentItem().text()
+        path = paths.IMAGES + self.list_filenames.currentItem().text()
 
         self.list_status.addItem("processing Image...")
         ret = self.imageDet.processImage(path)
@@ -103,13 +98,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
     def displayImageRes(self): 
-        path = "./../images/results/vis/" + self.list_filenames.currentItem().text()
+        path =  paths.IMAGES_RES + "/vis/" + self.list_filenames.currentItem().text()
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
         self.list_status.addItem("trying to display Result image")
 
     def openImageDialog(self): 
-        Imagedialog = ImageLarge(self)
+        Imagedialog = classes.ImageLarge(self)
         Imagedialog.setImage(self)
         Imagedialog.exec()
         
@@ -122,15 +117,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.list_status.addItem("-API changed to " + self.combo_api.currentText())
 
     def addImage(self): 
-        app = FileDialog(self)
-        #app.openFileNamesDialog()
+        app = classes.FileDialog(self)
         app.exec()
         #sys.exit(app.exec_())
 
 #Webcam Detection
     def startWebcam(self): 
         # create the video capture thread
-        self.thread = VideoThread()
+        self.thread = classes.VideoThread()
         # connect its signal to the update_image slot
         self.thread.change_pixmap_signal.connect(self.update_image)
         # start the thread
@@ -138,10 +132,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def stopWebcam(self): 
         self.thread.stop()
-
-    def startHandGestureRecog(self): 
-        #execute TechVidvan-hand_gesture_detection.py
-        return 0    
 
 
     @pyqtSlot(np.ndarray)

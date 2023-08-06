@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 )
 
 import cv2
+import constants.paths
 
 from scripts.helpers import convert_cv_qt
 
@@ -15,7 +16,7 @@ class ImageLarge(QDialog):
         loadUi("./../qt/imageLarge.ui", self)
 
     def setImage(self, parent): 
-        path = "./../images/results/vis/" + parent.list_filenames.currentItem().text()
+        path = paths.IMAGES_RES + "/vis/" + parent.list_filenames.currentItem().text()
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         print(im_cv.shape)
         if(im_cv != []): 
