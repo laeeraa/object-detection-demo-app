@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import (
 )
 
 import cv2
-import constants.paths
+import constants
+from constants import paths
 
 from scripts.helpers import convert_cv_qt
 

@@ -10,7 +10,7 @@ from mmdet.apis import DetInferencer
 from mmdet.evaluation import get_classes
 
 import classes
-import constants.paths as paths
+from constants import paths
 
 class ImageDet(): 
 

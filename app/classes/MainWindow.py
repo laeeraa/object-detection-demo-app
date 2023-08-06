@@ -14,8 +14,7 @@ from scripts.helpers import convert_cv_qt
 
 from qt import Ui_MainWindow
 import classes
-import constants.paths as paths
-
+from constants import paths
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):

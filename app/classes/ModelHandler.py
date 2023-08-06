@@ -1,7 +1,7 @@
 import os
 import yaml
 from classes.Model import Model
-import constants.paths as paths
+from constants import paths
 
 class ModelHandler: 
     def __init__(self):
