@@ -1,49 +1,72 @@
 import os
 import yaml
-from classes.Model import Model
+from classes.Collection import Collection
 from constants import paths
+import json
+from scripts.helpers import get_field
+from classes.Model import Model
 
 class ModelHandler: 
     def __init__(self):
+        self.collections = []
         self.models = []
+        self.collections_filtered = []
+        self.models_filtered = []
         self.getMMDetModels()
     
     def getMMDetModels(self): 
-        models = []
         for dir in os.scandir(paths.MMDET_MODELS):
             if dir.is_dir():
                 for file in os.scandir(dir.path): 
                     if file.is_file(): 
                         ext = os.path.splitext(file.path)[-1].lower()
-                        gruppe = dir.name
+                        coll = dir.name
                         if ext == ".yml": 
-                            self.parseYamlFile(file.path, gruppe)
+                            self.parseYamlFile(file.path, coll)
             
-    def parseYamlFile(self, ymlFile, gruppe): 
+    def parseYamlFile(self, ymlFile, dir): 
         with open(ymlFile) as f:
-            result =  yaml.safe_load(f)
-            if "Models" in result: 
-                models = result["Models"]
-                if models != []: 
-                    for m in models: 
-                        if "Name" in m: 
-                            self.models.append(Model(name = m['Name'], group = gruppe))
+            json_data =  yaml.safe_load(f)
+            if "Collections" in json_data: 
+                self.collections.append(self.parseCollection(json_data, dir))
 
-    def getModels(self): 
-        #iterate over models in Model Directory
-        for dir in os.scandir(paths.USER_MODELS):
-            if dir.is_dir():
-                print(dir.path)
-                name = dir.name
-                configPath = None
-                weightPath = None
-                for file in os.scandir(dir.path): 
-                    if file.is_file(): 
-                        ext = os.path.splitext(file.path)[-1].lower() 
-                        if ext == ".py": 
-                            configPath = file.path
-                        elif  ext == ".pth":
-                            weightPath = file.path
+    def parseCollection(self, dict, dir): 
+            coll = None
+            collection_json = dict.get("Collections")[0]
+            if "Name" in collection_json:
+                coll = Collection(
+                    collection_json.get('Name'),
+                    collection_json.get('Metadata'),
+                    collection_json.get('Paper'),
+                    collection_json.get('README'),
+                    collection_json.get('Code')
+                )
+            else: 
+                coll = Collection(name = dir)
 
-                if configPath is not None and weightPath is not None: 
-                    self.models.append(Model(name, configPath, weightPath))
+            # Create ModelInfo objects for each model in the collection
+            for model_data in get_field(dict, "Models"):
+                model = Model(
+                    get_field(model_data, "Name"),
+                    get_field(model_data, "In Collection"),
+                    get_field(model_data, "Config"),
+                    get_field(model_data, "Metadata"),
+                    get_field(model_data, "Results"),
+                    get_field(model_data, "Weights"),
+                )
+                coll.add_model(model)
+                self.models.append(model)
+            return coll
+    
+    def find_collection(self,name): 
+        for c in self.collections: 
+            if c.name == name: 
+                return c
+        
+        return None
+
+    def find_model(self, name): 
+        for m in self.models: 
+            if m.name == name: 
+                return m
+        return None

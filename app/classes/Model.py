@@ -1,14 +1,12 @@
-class Model: 
-    def __init__(self):
-        self.group = ""
-        self.name = ""
-        self.configPath = None
-        self.weightPath = None
-        self.architecture = ""
-        self.tasks = ""
-
-    def __init__(self, name, configPath=None, weightPath=None, group=""):
+class Model:
+    def __init__(self, name, collection, config, metadata, results, weights):
         self.name = name
-        self.configPath = configPath
-        self.weightPath = weightPath
-        self.group = group 
+        self.collection = collection
+        self.config = config
+        if(metadata != None): self.metadata = metadata
+        self.results = results
+        self.weights = weights
+
+    def __str__(self):
+        return f"Name: {self.name}\nIn Collection: {self.collection}\nConfig: {self.config}\nMetadata: {self.metadata}\nResults: {self.results}\nWeights: {self.weights}"
+

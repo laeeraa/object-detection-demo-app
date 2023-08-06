@@ -514,19 +514,6 @@ p, li { white-space: pre-wrap; }
         <string>Image Detection</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="6" column="1">
-         <widget class="QComboBox" name="combo_chooseDevice"/>
-        </item>
-        <item row="14" column="1">
-         <widget class="QComboBox" name="comboBox_3">
-          <property name="editable">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>choose weights</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0" colspan="3">
          <widget class="QTextEdit" name="txt_ImageDet">
           <property name="sizePolicy">
@@ -562,13 +549,10 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="19" column="0" colspan="2">
+        <item row="21" column="0" colspan="2">
          <widget class="QLineEdit" name="lineEdit_2"/>
         </item>
-        <item row="17" column="0">
-         <widget class="QComboBox" name="comboBox_6"/>
-        </item>
-        <item row="14" column="0">
+        <item row="12" column="0">
          <widget class="QComboBox" name="combo_chooseUserModel">
           <property name="editable">
            <bool>false</bool>
@@ -581,53 +565,125 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Choose device</string>
+        <item row="12" column="2" rowspan="9">
+         <widget class="QTableWidget" name="tb_collInfo">
+          <property name="styleSheet">
+           <string notr="true">font-size: 11px;
+line-height: 0.5;
+padding: 0; 
+margin: 0; 
+</string>
           </property>
+          <property name="showGrid">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Trainingdata</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Training Techniques</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Training Resources</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Architecture</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Paper</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>README</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Code</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string/>
+           </property>
+          </column>
+          <item row="0" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="1" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="2" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="3" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="4" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="5" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="6" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="7" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
          </widget>
         </item>
-        <item row="17" column="1">
-         <widget class="QLineEdit" name="lineEdit_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+        <item row="24" column="1">
+         <widget class="QComboBox" name="comboBox_8"/>
         </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Info </string>
-          </property>
-         </widget>
-        </item>
-        <item row="26" column="0">
-         <widget class="QPushButton" name="btn_addImage">
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>99</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
+        <item row="23" column="0">
+         <widget class="QLabel" name="label_3">
           <property name="styleSheet">
            <string notr="true"/>
           </property>
           <property name="text">
-           <string>Add data</string>
+           <string>Choose images</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="2">
-         <widget class="QLabel" name="label_14">
+        <item row="23" column="1">
+         <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>Model Info</string>
+           <string>or choose dataset</string>
           </property>
          </widget>
         </item>
@@ -660,7 +716,111 @@ p, li { white-space: pre-wrap; }
           </item>
          </widget>
         </item>
-        <item row="15" column="1">
+        <item row="11" column="2">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Collection Info</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QPushButton" name="pushButton">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>upload model</string>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="1">
+         <widget class="QLineEdit" name="lineEdit_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Choose a model </string>
+          </property>
+         </widget>
+        </item>
+        <item row="19" column="0">
+         <widget class="QComboBox" name="comboBox_6"/>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Info </string>
+          </property>
+         </widget>
+        </item>
+        <item row="26" column="0" colspan="2">
+         <widget class="QListWidget" name="list_filenames">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>11</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="lineWidth">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QComboBox" name="combo_chooseDevice"/>
+        </item>
+        <item row="14" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Specify threshhold</string>
+          </property>
+         </widget>
+        </item>
+        <item row="24" column="0">
+         <widget class="QComboBox" name="comboBox_5"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Choose an API</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="1">
          <widget class="QPushButton" name="pushButton_2">
           <property name="font">
            <font>
@@ -673,13 +833,6 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>upload weights</string>
-          </property>
-         </widget>
-        </item>
-        <item row="16" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Specify threshhold</string>
           </property>
          </widget>
         </item>
@@ -696,11 +849,238 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="22" column="0">
-         <widget class="QComboBox" name="comboBox_5"/>
+        <item row="14" column="1">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Specify batchsize</string>
+          </property>
+         </widget>
         </item>
-        <item row="10" column="0" colspan="2">
-         <widget class="QComboBox" name="combo_model">
+        <item row="28" column="0">
+         <widget class="QPushButton" name="btn_addImage">
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Add data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="QComboBox" name="comboBox_3">
+          <property name="editable">
+           <bool>false</bool>
+          </property>
+          <property name="placeholderText">
+           <string>choose weights</string>
+          </property>
+         </widget>
+        </item>
+        <item row="28" column="1">
+         <widget class="QPushButton" name="btn_process">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font:&quot;Segoe UI Semilight&quot;; 
+font-size: 12
+</string>
+          </property>
+          <property name="text">
+           <string>Process Data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="20" column="0" colspan="2">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Specify output directory</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Choose device</string>
+          </property>
+         </widget>
+        </item>
+        <item row="23" column="2" rowspan="5" colspan="2">
+         <widget class="QLabel" name="lb_image_orig">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>700</width>
+            <height>500</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="21" column="2" colspan="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Original Image: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" rowspan="6" colspan="2">
+         <widget class="QListWidget" name="list_status"/>
+        </item>
+        <item row="11" column="3">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Model Info</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="3" rowspan="9">
+         <widget class="QTableWidget" name="tb_modelInfo">
+          <property name="styleSheet">
+           <string notr="true">font-size: 11px;
+line-height: 0.5;
+padding: 0; 
+margin: 0; </string>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderMinimumSectionSize">
+           <number>36</number>
+          </attribute>
+          <row>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Config</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Batch Size</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Training Memory (GB)</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Inference time (ms/im)</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Epochs</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Task</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Dataset</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Metrics</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string/>
+           </property>
+          </column>
+          <item row="0" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="1" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="2" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="3" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="4" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="5" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="6" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="7" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+          <item row="8" column="0">
+           <property name="text">
+            <string> </string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QComboBox" name="combo_collection">
           <property name="font">
            <font>
             <family>Segoe UI Semilight</family>
@@ -741,165 +1121,8 @@ p, li { white-space: pre-wrap; }
           </item>
          </widget>
         </item>
-        <item row="16" column="1">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>Specify batchsize</string>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="0">
-         <widget class="QPushButton" name="pushButton">
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>99</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>upload model</string>
-          </property>
-         </widget>
-        </item>
-        <item row="26" column="1">
-         <widget class="QPushButton" name="btn_process">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <italic>false</italic>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font:&quot;Segoe UI Semilight&quot;; 
-font-size: 12
-</string>
-          </property>
-          <property name="text">
-           <string>Process Data</string>
-          </property>
-         </widget>
-        </item>
-        <item row="18" column="0" colspan="2">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Specify output directory</string>
-          </property>
-         </widget>
-        </item>
-        <item row="21" column="1">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>or choose dataset</string>
-          </property>
-         </widget>
-        </item>
-        <item row="22" column="1">
-         <widget class="QComboBox" name="comboBox_8"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Choose an API</string>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="2" rowspan="5">
-         <widget class="QTextEdit" name="textEdit"/>
-        </item>
-        <item row="9" column="0" colspan="2">
-         <widget class="QLabel" name="label_2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Choose a model </string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2" rowspan="6">
-         <widget class="QListWidget" name="list_status"/>
-        </item>
-        <item row="21" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Choose images</string>
-          </property>
-         </widget>
-        </item>
-        <item row="19" column="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Original Image: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="21" column="2" rowspan="5">
-         <widget class="QLabel" name="lb_image_orig">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>700</width>
-            <height>500</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="24" column="0" colspan="2">
-         <widget class="QListWidget" name="list_filenames">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>11</pointsize>
-            <weight>50</weight>
-            <italic>false</italic>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-         </widget>
+        <item row="10" column="1">
+         <widget class="QComboBox" name="combo_model"/>
         </item>
        </layout>
       </widget>

@@ -5,3 +5,4 @@ from classes.MainWindow import MainWindow
 from classes.Model import Model
 from classes.ModelHandler import ModelHandler
 from classes.VideoThread import VideoThread
+from classes.Collection import Collection

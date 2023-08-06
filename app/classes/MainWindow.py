@@ -40,6 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
         self.combo_model.currentIndexChanged.connect(self.modelchanged)
+        self.combo_collection.currentIndexChanged.connect(self.coll_changed)
         self.combo_api.currentIndexChanged.connect(self.apichanged)
         self.btn_addImage.clicked.connect(self.addImage)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
@@ -47,10 +48,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
     
     #check which models exist in filepath and add those to dropdown 
-    def initModelOptions(self): 
+    def initModelOptions(self):
+        #init Collections Combo Box
+        self.combo_collection.clear()
+        for c in self.modelHandler.collections: 
+            self.combo_collection.addItem(c.name)
+        self.combo_collection.setCurrentIndex(-1)
+        self.combo_collection.setCurrentText("Choose a collection")
+       
+        #init Model ComboBox
         self.combo_model.clear()
-        for m in self.modelHandler.models: 
-            self.combo_model.addItem(m.name)
+        
+        for c in self.modelHandler.collections:
+            for m in c.models: 
+                self.combo_model.addItem(m.name)
+
         self.combo_model.setCurrentIndex(-1)
         self.combo_model.setCurrentText("Choose a model")
         self.combo_api.setCurrentIndex(-1)
@@ -106,9 +118,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog = classes.ImageLarge(self)
         Imagedialog.setImage(self)
         Imagedialog.exec()
-        
+    
+    def update_CollTable(self): 
+        self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
+        self.tb_collInfo.item(1,0).setText(self.imageDet.collection.metadata.training_data)
+        self.tb_collInfo.item(2,0).setText(self.imageDet.collection.metadata.training_techniques)
+        self.tb_collInfo.item(3,0).setText(self.imageDet.collection.metadata.training_resources)
+        self.tb_collInfo.item(4,0).setText("")
+
+
+    def update_ModelTable(self): 
+        # self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
+        # self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
+        # self.tb_modelInfo.item(2,0).setText(self.imageDet.model.metadata)
+        # self.tb_modelInfo.item(3,0).setText(self.imageDet.model.name)
+        # self.tb_modelInfo.item(4,0).setText(self.imageDet.model.)
+        # self.tb_modelInfo.item(5,0).setText(self.imageDet.model.name)
+
+        pass
+
+    def coll_changed(self): 
+        if(self.combo_model.currentIndex != -1):
+            self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
+        self.update_CollTable()
+    
+    def model_changed(self): 
+        if(self.combo_model.currentIndex != -1):
+            self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
+        self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+
     def modelchanged(self): 
-        self.imageDet.changemodelconfig(self.modelHandler.models[self.combo_model.currentIndex()])
+        #self.imageDet.changemodelconfig(self.modelHandler.models[self.combo_model.currentIndex()])
+        self.update
+        #self.tb_collInfo.setItem("")
         self.list_status.addItem("-model changed to " + self.combo_model.currentText())
     
     def apichanged(self): 
@@ -119,6 +161,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         app = classes.FileDialog(self)
         app.exec()
         #sys.exit(app.exec_())
+
+    # def updateModelInfo(){
+    #     metafile_json = self.modelHandler.models[self.combo_model.currentIndex()].configpath
+    # }
 
 #Webcam Detection
     def startWebcam(self): 

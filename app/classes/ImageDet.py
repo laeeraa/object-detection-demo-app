@@ -17,7 +17,8 @@ class ImageDet():
     def __init__(self, parent=None):
         #defs for the model
         self.imagepath=""
-        self.model= classes.Model("YOLOV3", "./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco.py", "./../OpenMMLab/mmdetection/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
+        self.model= classes.Model(name ="YOLOV3", collection = "User", metadata=None, results=None, config = paths.USER_MODELS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", weights = paths.USER_MODELS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
+        self.collection = classes.Collection("USER")
         self.device="cpu"
         self.palette="coco"
         self.score_thr=float(0.3)
@@ -33,11 +34,10 @@ class ImageDet():
                 return self.processImage_OpenMMLab(image_path)
         else:
             return None
+    
 
     def processImage_OpenMMLab(self,image_path):
         outFile=paths.IMAGES_RES
-        #print("Configpath", self.model.configPath)
-        #print("Weightspath", self.model.weightPath)
 
         # build the model from a config file and a checkpoint file
         inferencer = DetInferencer(model=self.model.name, device=self.device)
