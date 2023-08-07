@@ -1,7 +1,7 @@
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import (QMainWindow,QHeaderView ) 
 
 from PyQt5.QtCore import(
     QDir, pyqtSlot
@@ -24,10 +24,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stopHandGestureRecogEvent = Event()
 
         super().__init__(parent)
+
         self.setupUi(self)
         self.connectSignalsSlots()
         self.loadImages()
         self.initModelOptions()
+        self.init_CollTable()
+        self.init_ModelTable()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -39,7 +42,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
-        self.combo_model.currentIndexChanged.connect(self.modelchanged)
+        self.combo_model.currentIndexChanged.connect(self.model_changed)
         self.combo_collection.currentIndexChanged.connect(self.coll_changed)
         self.combo_api.currentIndexChanged.connect(self.apichanged)
         self.btn_addImage.clicked.connect(self.addImage)
@@ -118,34 +121,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog = classes.ImageLarge(self)
         Imagedialog.setImage(self)
         Imagedialog.exec()
+
+    def init_CollTable(self): 
+        header = self.tb_collInfo.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
+
+    def init_ModelTable(self): 
+        header = self.tb_modelInfo.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
     
     def update_CollTable(self): 
         self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
         self.tb_collInfo.item(1,0).setText(self.imageDet.collection.metadata.training_data)
         self.tb_collInfo.item(2,0).setText(self.imageDet.collection.metadata.training_techniques)
         self.tb_collInfo.item(3,0).setText(self.imageDet.collection.metadata.training_resources)
-        self.tb_collInfo.item(4,0).setText("")
+        self.tb_collInfo.item(4,0).setText(self.imageDet.collection.metadata.architecture)
+        self.tb_collInfo.item(5,0).setText(str(self.imageDet.collection.paper))
+        self.tb_collInfo.item(6,0).setText(self.imageDet.collection.readme)
+        self.tb_collInfo.item(7,0).setText(str(self.imageDet.collection.code))
 
 
     def update_ModelTable(self): 
-        # self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
-        # self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
-        # self.tb_modelInfo.item(2,0).setText(self.imageDet.model.metadata)
-        # self.tb_modelInfo.item(3,0).setText(self.imageDet.model.name)
-        # self.tb_modelInfo.item(4,0).setText(self.imageDet.model.)
-        # self.tb_modelInfo.item(5,0).setText(self.imageDet.model.name)
-
-        pass
+        self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
+        self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
+        self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
+        self.tb_modelInfo.item(3,0).setText(str(self.imageDet.model.results))
+        self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
 
     def coll_changed(self): 
-        if(self.combo_model.currentIndex != -1):
+        if(self.combo_collection.currentIndex() >=0):
             self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
-        self.update_CollTable()
+            self.update_CollTable()
     
     def model_changed(self): 
-        if(self.combo_model.currentIndex != -1):
+        if(self.combo_model.currentIndex() >= 0):
             self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
-        self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+            self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+            self.update_ModelTable()
 
     def modelchanged(self): 
         #self.imageDet.changemodelconfig(self.modelHandler.models[self.combo_model.currentIndex()])

@@ -15,6 +15,7 @@ class ModelHandler:
         self.getMMDetModels()
     
     def getMMDetModels(self): 
+        print("Scanning Directory {paths.MMDET_MODELS} for collections and models ... ")
         for dir in os.scandir(paths.MMDET_MODELS):
             if dir.is_dir():
                 for file in os.scandir(dir.path): 
@@ -23,7 +24,8 @@ class ModelHandler:
                         coll = dir.name
                         if ext == ".yml": 
                             self.parseYamlFile(file.path, coll)
-            
+        print("Finished ")
+   
     def parseYamlFile(self, ymlFile, dir): 
         with open(ymlFile) as f:
             json_data =  yaml.safe_load(f)
@@ -51,9 +53,14 @@ class ModelHandler:
                     get_field(model_data, "In Collection"),
                     get_field(model_data, "Config"),
                     get_field(model_data, "Metadata"),
-                    get_field(model_data, "Results"),
                     get_field(model_data, "Weights"),
                 )
+                for r in  model_data.get("Results"): 
+                    model.add_results(
+                        r.get("task"),
+                        r.get("dataset"), 
+                        r.get("metrics")
+                    )
                 coll.add_model(model)
                 self.models.append(model)
             return coll

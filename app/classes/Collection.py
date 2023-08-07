@@ -12,6 +12,7 @@ class Metadata:
     def __str__(self):
         techniques_str = ", ".join(self.training_techniques)
         architecture_str = ", ".join(self.architecture)
+         
         return f"Training Data: {self.training_data}\nTraining Techniques: {techniques_str}\nTraining Resources: {self.training_resources}\nArchitecture: {architecture_str}"
 
 
@@ -33,7 +34,8 @@ class Collection:
     def add_model(self, model):
         self.models.append(model)
 
-
     def __str__(self):
+        paper_str  = ", ".join([f"{key}: {value}" for key, value in self.paper.items()])
+        code_str  = ", ".join([f"{key}: {value}" for key, value in self.code.items()])
         models_str = "\n".join([f"- {model}" for model in self.models])
-        return f"Name: {self.name}\nMetadata: {self.metadata}\nPaper: {self.paper}\nREADME: {self.readme}\nCode: {self.code}\nModels:\n{models_str}"
+        return f"Name: {self.name}\nMetadata: {self.metadata}\nPaper: {paper_str}\nREADME: {self.readme}\nCode: {self.code}\nModels:\n{models_str}"
