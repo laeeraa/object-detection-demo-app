@@ -5,7 +5,6 @@ from PyQt5.QtGui import QPixmap
 import json
 
 
-
 def convert_cv_qt(cv_img, height=400, width=600):
     """Convert from an opencv image to QPixmap"""
     rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)

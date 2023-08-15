@@ -12,6 +12,8 @@ import numpy as np
 from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 from scripts.helpers import convert_cv_qt
 
+
+
 from qt import Ui_MainWindow
 import classes
 from constants import paths
@@ -31,6 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initModelOptions()
         self.init_CollTable()
         self.init_ModelTable()
+        self.init_DeviceOptions()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -49,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
         self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
-    
+        self.combo_chooseDevice.currentIndexChanged.connect(self.device_changed)
     #check which models exist in filepath and add those to dropdown 
     def initModelOptions(self):
         #init Collections Combo Box
@@ -66,10 +69,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for m in c.models: 
                 self.combo_model.addItem(m.name)
 
-        self.combo_model.setCurrentIndex(-1)
-        self.combo_model.setCurrentText("Choose a model")
-        self.combo_api.setCurrentIndex(-1)
-        self.combo_api.setCurrentText("Choose an API")
+        #self.combo_model.setCurrentIndex(0)
+        #self.combo_model.setCurrentText("Choose a model")
+        #self.combo_api.setCurrentIndex(0)
+        #self.combo_api.setCurrentText("Choose an API")
 
     def openImageDetection(self):
         self.tabWidget.setCurrentIndex(1)
@@ -139,7 +142,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tb_modelInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-    
+    def init_DeviceOptions(self): 
+        self.combo_chooseDevice.clear() 
+        for g in self.modelHandler.devices: 
+            self.combo_chooseDevice.addItem(g.name)
+
     def update_CollTable(self): 
         self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
         self.tb_collInfo.item(1,0).setText(self.imageDet.collection.metadata.training_data)
@@ -173,6 +180,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update_CollTable()
             self.update_models()
     
+    def device_changed(self): 
+        self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
+        print("Device changed to: " + self.imageDet.device)
+
     def update_models(self): 
          #init Model ComboBox
         self.combo_model.clear()

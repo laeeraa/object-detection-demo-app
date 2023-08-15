@@ -24,7 +24,6 @@ class ImageDet():
         self.score_thr=float(0.3)
         self.api = "OpenMMLab"
 
-
     def changemodelconfig(self,model): 
         self.model = model
 

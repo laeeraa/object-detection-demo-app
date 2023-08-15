@@ -3,6 +3,14 @@ import yaml
 from classes.Collection import Collection
 from constants import paths
 from classes.Model import Model, Result
+import cpuinfo  
+import torch  
+
+class Device:
+    def __init__(self, name="CPU", inference_string="cpu", cudaDevice = None):
+        self.name = name
+        self.inference_string = inference_string
+        self.cudaDevice = cudaDevice
 
 class ModelHandler: 
     def __init__(self):
@@ -11,6 +19,9 @@ class ModelHandler:
         self.collections_filtered = []
         self.models_filtered = []
         self.getMMDetModels()
+        self.devices = []
+
+        self.init_deviceOptions()
     
     def getMMDetModels(self): 
         print("Scanning Directory %s for collections and models ... " % (paths.MMDET_MODELS))
@@ -73,3 +84,16 @@ class ModelHandler:
             if m.name == name: 
                 return m
         return None
+    
+    def init_deviceOptions(self): 
+        #get CPU Name
+        device = Device(cpuinfo.get_cpu_info()['brand_raw'], "cpu")
+        self.devices.append(device) # get only the brand name
+        
+        #get Cudadevices
+        for i in range(torch.cuda.device_count()):
+            inference_str = "cuda:"+ i
+            print("Cuda:" + i + "\t" + torch.cuda.get_device_properties(i).name)
+            device = Device(torch.cuda.get_device_properties(i).name, inference_str, torch.cuda.device(i))
+            self.devices.append(device)
+
