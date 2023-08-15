@@ -1,7 +1,7 @@
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (QMainWindow,QHeaderView ) 
+from PyQt5.QtWidgets import (QMainWindow,QHeaderView, QAbstractItemView ) 
 
 from PyQt5.QtCore import(
     QDir, pyqtSlot
@@ -124,11 +124,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def init_CollTable(self): 
         header = self.tb_collInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        headerV = self.tb_collInfo.verticalHeader()
+        headerV.setDefaultSectionSize(37)
+        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_collInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
 
     def init_ModelTable(self): 
         header = self.tb_modelInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        headerV = self.tb_modelInfo.verticalHeader()
+        headerV.setDefaultSectionSize(37)
+        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_modelInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
     
     def update_CollTable(self): 
         self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
@@ -142,28 +152,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def update_ModelTable(self): 
-        self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
-        self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
-        self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
-        self.tb_modelInfo.item(3,0).setText(str(self.imageDet.model.results))
-        self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
+        if(self.imageDet.model != None): 
+            self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
+            self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
+            self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
+            results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
+            self.tb_modelInfo.item(3,0).setText(results_string)
+            self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
+        else: 
+            self.tb_modelInfo.item(0,0).setText(" ")
+            self.tb_modelInfo.item(1,0).setText(" ")
+            self.tb_modelInfo.item(2,0).setText(" ")
+            self.tb_modelInfo.item(3,0).setText(" ")
+            self.tb_modelInfo.item(4,0).setText(" ")
+
 
     def coll_changed(self): 
         if(self.combo_collection.currentIndex() >=0):
             self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
             self.update_CollTable()
+            self.update_models()
     
+    def update_models(self): 
+         #init Model ComboBox
+        self.combo_model.clear()
+        self.imageDet.model = None; 
+        for m in self.imageDet.collection.models:
+            self.combo_model.addItem(m.name)
+
     def model_changed(self): 
         if(self.combo_model.currentIndex() >= 0):
             self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
             self.list_status.addItem("-model changed to " + self.combo_model.currentText())
             self.update_ModelTable()
-
-    def modelchanged(self): 
-        #self.imageDet.changemodelconfig(self.modelHandler.models[self.combo_model.currentIndex()])
-        self.update
-        #self.tb_collInfo.setItem("")
-        self.list_status.addItem("-model changed to " + self.combo_model.currentText())
     
     def apichanged(self): 
         self.imageDet.api = self.combo_api.currentText()

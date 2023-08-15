@@ -38,4 +38,4 @@ class Collection:
         paper_str  = ", ".join([f"{key}: {value}" for key, value in self.paper.items()])
         code_str  = ", ".join([f"{key}: {value}" for key, value in self.code.items()])
         models_str = "\n".join([f"- {model}" for model in self.models])
-        return f"Name: {self.name}\nMetadata: {self.metadata}\nPaper: {paper_str}\nREADME: {self.readme}\nCode: {self.code}\nModels:\n{models_str}"
+        return f"Name: {self.name}\nMetadata: {self.metadata}\nPaper: {paper_str}\nREADME: {self.readme}\nCode: {code_str}\nModels:\n{models_str}"

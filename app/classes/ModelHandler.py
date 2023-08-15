@@ -2,9 +2,7 @@ import os
 import yaml
 from classes.Collection import Collection
 from constants import paths
-import json
-from scripts.helpers import get_field
-from classes.Model import Model
+from classes.Model import Model, Result
 
 class ModelHandler: 
     def __init__(self):
@@ -15,7 +13,7 @@ class ModelHandler:
         self.getMMDetModels()
     
     def getMMDetModels(self): 
-        print("Scanning Directory {paths.MMDET_MODELS} for collections and models ... ")
+        print("Scanning Directory %s for collections and models ... " % (paths.MMDET_MODELS))
         for dir in os.scandir(paths.MMDET_MODELS):
             if dir.is_dir():
                 for file in os.scandir(dir.path): 
@@ -23,16 +21,16 @@ class ModelHandler:
                         ext = os.path.splitext(file.path)[-1].lower()
                         coll = dir.name
                         if ext == ".yml": 
-                            self.parseYamlFile(file.path, coll)
-        print("Finished ")
+                            self.parse_yml_file(file.path, coll)
+        print("...finished initializing collections and models")
    
-    def parseYamlFile(self, ymlFile, dir): 
+    def parse_yml_file(self, ymlFile, dir): 
         with open(ymlFile) as f:
             json_data =  yaml.safe_load(f)
             if "Collections" in json_data: 
-                self.collections.append(self.parseCollection(json_data, dir))
+                self.collections.append(self.parse_collection(json_data, dir))
 
-    def parseCollection(self, dict, dir): 
+    def parse_collection(self, dict, dir): 
             coll = None
             collection_json = dict.get("Collections")[0]
             if "Name" in collection_json:
@@ -47,22 +45,20 @@ class ModelHandler:
                 coll = Collection(name = dir)
 
             # Create ModelInfo objects for each model in the collection
-            for model_data in get_field(dict, "Models"):
-                model = Model(
-                    get_field(model_data, "Name"),
-                    get_field(model_data, "In Collection"),
-                    get_field(model_data, "Config"),
-                    get_field(model_data, "Metadata"),
-                    get_field(model_data, "Weights"),
-                )
-                for r in  model_data.get("Results"): 
-                    model.add_results(
-                        r.get("task"),
-                        r.get("dataset"), 
-                        r.get("metrics")
+            if(dict.get("Models")):
+                for model_data in dict.get("Models"):
+                    model = Model(
+                        model_data.get("Name"),
+                        model_data.get("In Collection"),
+                        model_data.get("Config"),
+                        model_data.get("Metadata"),
+                        model_data.get("Weights"),
                     )
-                coll.add_model(model)
-                self.models.append(model)
+                    for r in  model_data.get("Results"): 
+                        result = Result(r.get("Task"), r.get("Dataset"),  r.get("Metrics"))
+                        model.add_results(result)
+                    coll.add_model(model)
+                    self.models.append(model)
             return coll
     
     def find_collection(self,name): 
