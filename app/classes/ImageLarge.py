@@ -14,7 +14,7 @@ class ImageLarge(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        loadUi("./../qt/imageLarge.ui", self)
+        loadUi(paths.IMAGELARGE_UI, self)
 
     def setImage(self, parent): 
         path = paths.IMAGES_RES + "/vis/" + parent.list_filenames.currentItem().text()

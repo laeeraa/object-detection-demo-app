@@ -34,6 +34,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.init_CollTable()
         self.init_ModelTable()
         self.init_DeviceOptions()
+        self.init_Params()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -47,12 +48,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
         self.combo_model.currentIndexChanged.connect(self.model_changed)
         self.combo_collection.currentIndexChanged.connect(self.coll_changed)
-        self.combo_api.currentIndexChanged.connect(self.apichanged)
-        self.btn_addImage.clicked.connect(self.addImage)
+        self.combo_api.currentIndexChanged.connect(self.api_changed)
+        self.btn_addImage.clicked.connect(self.open_FileDialog)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
         self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
         self.combo_chooseDevice.currentIndexChanged.connect(self.device_changed)
+        self.ln_batchSize.editingFinished.connect(self.batchSize_changed)
+        self.ln_outputDir.editingFinished.connect(self.outputDir_changed)
+        self.ln_threshhold.editingFinished.connect(self.threshhold_changed)
+    
     #check which models exist in filepath and add those to dropdown 
     def initModelOptions(self):
         #init Collections Combo Box
@@ -60,7 +65,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for c in self.modelHandler.collections: 
             self.combo_collection.addItem(c.name)
         self.combo_collection.setCurrentIndex(-1)
-        self.combo_collection.setCurrentText("Choose a collection")
        
         #init Model ComboBox
         self.combo_model.clear()
@@ -69,11 +73,110 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for m in c.models: 
                 self.combo_model.addItem(m.name)
 
-        #self.combo_model.setCurrentIndex(0)
-        #self.combo_model.setCurrentText("Choose a model")
-        #self.combo_api.setCurrentIndex(0)
-        #self.combo_api.setCurrentText("Choose an API")
+#Init functions
+    def init_CollTable(self): 
+        header = self.tb_collInfo.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        headerV = self.tb_collInfo.verticalHeader()
+        headerV.setDefaultSectionSize(37)
+        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_collInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
 
+    def init_ModelTable(self): 
+        header = self.tb_modelInfo.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        headerV = self.tb_modelInfo.verticalHeader()
+        headerV.setDefaultSectionSize(37)
+        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_modelInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+    def init_DeviceOptions(self): 
+        self.combo_chooseDevice.clear() 
+        for g in self.modelHandler.devices: 
+            self.combo_chooseDevice.addItem(g.name)
+    
+    def init_Params(self): 
+        self.imageDet.batch_size = 1 
+        self.imageDet.score_thr = 0.3
+        self.imageDet.out_dir = paths.IMAGES_RES
+        self.ln_batchSize.setText(str(self.imageDet.batch_size))
+        self.ln_threshhold.setText(str(self.imageDet.score_thr))
+        self.ln_outputDir.setText(str(self.imageDet.out_dir))
+
+
+#update Functions
+    def update_CollTable(self): 
+        self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
+        self.tb_collInfo.item(1,0).setText(self.imageDet.collection.metadata.training_data)
+        self.tb_collInfo.item(2,0).setText(self.imageDet.collection.metadata.training_techniques)
+        self.tb_collInfo.item(3,0).setText(self.imageDet.collection.metadata.training_resources)
+        self.tb_collInfo.item(4,0).setText(self.imageDet.collection.metadata.architecture)
+        self.tb_collInfo.item(5,0).setText(str(self.imageDet.collection.paper))
+        self.tb_collInfo.item(6,0).setText(self.imageDet.collection.readme)
+        self.tb_collInfo.item(7,0).setText(str(self.imageDet.collection.code))
+
+
+    def update_ModelTable(self): 
+        if(self.imageDet.model != None): 
+            self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
+            self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
+            self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
+            results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
+            self.tb_modelInfo.item(3,0).setText(results_string)
+            self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
+        else: 
+            self.tb_modelInfo.item(0,0).setText(" ")
+            self.tb_modelInfo.item(1,0).setText(" ")
+            self.tb_modelInfo.item(2,0).setText(" ")
+            self.tb_modelInfo.item(3,0).setText(" ")
+            self.tb_modelInfo.item(4,0).setText(" ")
+
+
+    def coll_changed(self): 
+        if(self.combo_collection.currentIndex() >=0):
+            self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
+            self.update_CollTable()
+            self.update_models()
+    
+    def device_changed(self): 
+        self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
+        print("Device changed to: " + self.imageDet.device)
+    
+    def update_models(self): 
+         #init Model ComboBox
+        self.combo_model.clear()
+        self.imageDet.model = None; 
+        for m in self.imageDet.collection.models:
+            self.combo_model.addItem(m.name)
+
+    def model_changed(self): 
+        if(self.combo_model.currentIndex() >= 0):
+            self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
+            self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+            self.update_ModelTable()
+    
+    def api_changed(self): 
+        self.imageDet.api = self.combo_api.currentText()
+        self.list_status.addItem("-API changed to " + self.combo_api.currentText())
+
+    def batchSize_changed(self): 
+        self.imageDet.batch_size = float(self.ln_batchSize.text())
+        print("Batchsize changed to " + str(self.imageDet.batch_size))
+    
+    def threshhold_changed(self): 
+        self.imageDet.score_thr = float(self.ln_threshhold.text())
+        print("Thresshold changed to "+ str(self.imageDet.score_thr))
+    
+    def outputDir_changed(self): 
+        self.imageDet.out_dir = self.ln_outputDir.text()
+        print("outputDir changed to " + self.imageDet.out_dir)
+
+    def open_FileDialog(self): 
+        app = classes.FileDialog(self)
+        app.exec()
+
+#Sonstige Funktionen 
     def openImageDetection(self):
         self.tabWidget.setCurrentIndex(1)
         self.loadImages()
@@ -125,90 +228,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog.setImage(self)
         Imagedialog.exec()
 
-    def init_CollTable(self): 
-        header = self.tb_collInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        headerV = self.tb_collInfo.verticalHeader()
-        headerV.setDefaultSectionSize(37)
-        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tb_collInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        
-
-    def init_ModelTable(self): 
-        header = self.tb_modelInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        headerV = self.tb_modelInfo.verticalHeader()
-        headerV.setDefaultSectionSize(37)
-        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tb_modelInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
-    def init_DeviceOptions(self): 
-        self.combo_chooseDevice.clear() 
-        for g in self.modelHandler.devices: 
-            self.combo_chooseDevice.addItem(g.name)
-
-    def update_CollTable(self): 
-        self.tb_collInfo.item(0,0).setText(self.imageDet.collection.name)
-        self.tb_collInfo.item(1,0).setText(self.imageDet.collection.metadata.training_data)
-        self.tb_collInfo.item(2,0).setText(self.imageDet.collection.metadata.training_techniques)
-        self.tb_collInfo.item(3,0).setText(self.imageDet.collection.metadata.training_resources)
-        self.tb_collInfo.item(4,0).setText(self.imageDet.collection.metadata.architecture)
-        self.tb_collInfo.item(5,0).setText(str(self.imageDet.collection.paper))
-        self.tb_collInfo.item(6,0).setText(self.imageDet.collection.readme)
-        self.tb_collInfo.item(7,0).setText(str(self.imageDet.collection.code))
-
-
-    def update_ModelTable(self): 
-        if(self.imageDet.model != None): 
-            self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
-            self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
-            self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
-            results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
-            self.tb_modelInfo.item(3,0).setText(results_string)
-            self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
-        else: 
-            self.tb_modelInfo.item(0,0).setText(" ")
-            self.tb_modelInfo.item(1,0).setText(" ")
-            self.tb_modelInfo.item(2,0).setText(" ")
-            self.tb_modelInfo.item(3,0).setText(" ")
-            self.tb_modelInfo.item(4,0).setText(" ")
-
-
-    def coll_changed(self): 
-        if(self.combo_collection.currentIndex() >=0):
-            self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
-            self.update_CollTable()
-            self.update_models()
-    
-    def device_changed(self): 
-        self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
-        print("Device changed to: " + self.imageDet.device)
-
-    def update_models(self): 
-         #init Model ComboBox
-        self.combo_model.clear()
-        self.imageDet.model = None; 
-        for m in self.imageDet.collection.models:
-            self.combo_model.addItem(m.name)
-
-    def model_changed(self): 
-        if(self.combo_model.currentIndex() >= 0):
-            self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
-            self.list_status.addItem("-model changed to " + self.combo_model.currentText())
-            self.update_ModelTable()
-    
-    def apichanged(self): 
-        self.imageDet.api = self.combo_api.currentText()
-        self.list_status.addItem("-API changed to " + self.combo_api.currentText())
-
-    def addImage(self): 
-        app = classes.FileDialog(self)
-        app.exec()
-        #sys.exit(app.exec_())
-
-    # def updateModelInfo(){
-    #     metafile_json = self.modelHandler.models[self.combo_model.currentIndex()].configpath
-    # }
 
 #Webcam Detection
     def startWebcam(self): 

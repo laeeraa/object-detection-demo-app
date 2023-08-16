@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFil
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
+from constants import paths
+
 class FileDialog(QDialog):
 
     def __init__(self, parent=None):
@@ -45,7 +47,7 @@ class FileDialog(QDialog):
         if files:
             print(files)
             for f in files: 
-                shutil.copy2(f, "./../images")
+                shutil.copy2(f, paths.IMAGES)
         self.done(1)
         self.parent.loadImages()
         
@@ -59,5 +61,5 @@ class FileDialog(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = fileDialog()
+    #ex = fileDialog()
     sys.exit(app.exec_())

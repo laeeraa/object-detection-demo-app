@@ -17,11 +17,17 @@ class ImageDet():
     def __init__(self, parent=None):
         #defs for the model
         self.imagepath=""
-        self.model= classes.Model(name ="YOLOV3", collection = "User", metadata=None, config = paths.USER_MODELS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", weights = paths.USER_MODELS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
+        self.model= classes.Model(name ="YOLOV3", 
+                                  collection = "User", 
+                                  metadata=None, 
+                                  config = paths.USER_MODELS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", 
+                                  weights = paths.USER_MODELS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
         self.collection = classes.Collection("USER")
         self.device="cpu"
         self.palette="coco"
         self.score_thr=float(0.3)
+        self.batch_size = 1
+        self.out_dir = paths.IMAGES_RES
         self.api = "OpenMMLab"
 
     def changemodelconfig(self,model): 
@@ -34,14 +40,10 @@ class ImageDet():
         else:
             return None
     
-
     def processImage_OpenMMLab(self,image_path):
-        outFile=paths.IMAGES_RES
-
         # build the model from a config file and a checkpoint file
         inferencer = DetInferencer(model=self.model.name, device=self.device)
-        resultdict = inferencer(out_dir=outFile, inputs=image_path)
-
+        resultdict = inferencer(out_dir=self.out_dir, inputs=image_path, pred_score_thr=self.score_thr, batch_size=self.batch_size)
         predTable = self.getPredTable(resultdict)
 
         return predTable
@@ -56,7 +58,7 @@ class ImageDet():
         
         i = 0
         for s in scores: 
-            if(s > 0.3): 
+            if(s > self.score_thr): 
                 pred = {
                     "labelno": labels[i],
                     "score": s,
