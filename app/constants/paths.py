@@ -1,8 +1,8 @@
 import os; 
 
-workingdir = os.getcwd()
+workingdir = os.getcwd().replace("\\", "/")
 
-MMDET_MODELS = workingdir +"/app/packages/OpenMMLab/mmdetection/configs"
+MMDET_MODELS = workingdir +"/app/packages/OpenMMLab/mmdetection/configs/"
 USER_MODELS = workingdir + "/data/models"
 
 IMAGES = workingdir + "/data/images/"

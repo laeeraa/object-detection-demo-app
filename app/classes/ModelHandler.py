@@ -20,7 +20,10 @@ class ModelHandler:
         self.models_filtered = []
         self.getMMDetModels()
         self.devices = []
+        self.usrCheckpoints = []
+        self.usrConfigs = []
 
+        self.get_UserModels()
         self.init_deviceOptions()
     
     def getMMDetModels(self): 
@@ -34,6 +37,20 @@ class ModelHandler:
                         if ext == ".yml": 
                             self.parse_yml_file(file.path, coll)
         print("...finished initializing collections and models")
+    
+    def get_UserModels(self): 
+        print("Scanning Directory %s for and Configs & Weights ... " % (paths.USER_MODELS))
+        for dir in os.scandir(paths.USER_MODELS):
+            if dir.is_dir() and dir.name == "checkpoints":
+                for file in os.scandir(dir.path): 
+                    if file.is_file(): 
+                        self.usrCheckpoints.append(file.name)
+            elif dir.is_dir() and dir.name == "configs": 
+                for file in os.scandir(dir.path): 
+                    if file.is_file(): 
+                        self.usrConfigs.append(file.name)
+        print("...finished initializing User Configs and Checkpoints")
+
    
     def parse_yml_file(self, ymlFile, dir): 
         with open(ymlFile) as f:

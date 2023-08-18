@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.init_ModelTable()
         self.init_DeviceOptions()
         self.init_Params()
+        self.init_userModels()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -103,7 +104,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ln_batchSize.setText(str(self.imageDet.batch_size))
         self.ln_threshhold.setText(str(self.imageDet.score_thr))
         self.ln_outputDir.setText(str(self.imageDet.out_dir))
-
+    
+    def init_userModels(self): 
+        for c in self.modelHandler.usrCheckpoints: 
+            self.combo_usrWeights.addItem(c)
+        for c in self.modelHandler.usrConfigs: 
+            self.combo_usrConfig.addItem(c)
 
 #update Functions
     def update_CollTable(self): 
