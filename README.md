@@ -62,3 +62,10 @@ pyuic5 -o main_window_ui.py .\Main_Window.ui
 python -m build --wheel
 ```
 
+
+# Anaconda Environment aufbauen 
+ 
+```
+conda env create -f ./setup/environment.yml --prefix ./env 
+conda activate ./env
+```
