@@ -31,25 +31,21 @@ class FileDialog(QDialog):
         self.openFileNamesDialog()
         #self.saveFileDialog()
 
-        self.show()
-    
-    def openFileNameDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
-        if fileName:
-            print(fileName)
+        #self.show()
     
     def openFileNamesDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","Image files (*.png *.xpm *.jpg)", options=options)
+        #called when open button is pushed in file dialog
         if files:
+            print("Adding files to data directory")
             print(files)
             for f in files: 
                 shutil.copy2(f, paths.IMAGES)
         self.done(1)
-        self.parent.loadImages()
+        self.parent.update_FilesList()
+        return 0
         
     
     def saveFileDialog(self):
@@ -59,7 +55,7 @@ class FileDialog(QDialog):
         if fileName:
             print(fileName)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    #ex = fileDialog()
-    sys.exit(app.exec_())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     #ex = fileDialog()
+#     sys.exit(app.exec_())

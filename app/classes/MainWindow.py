@@ -1,7 +1,8 @@
+import sys
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (QMainWindow,QHeaderView, QAbstractItemView ) 
+from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView ) 
 
 from PyQt5.QtCore import(
     QDir, pyqtSlot
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
         self.connectSignalsSlots()
-        self.loadImages()
+        self.update_FilesList()
         self.initModelOptions()
         self.init_CollTable()
         self.init_ModelTable()
@@ -180,12 +181,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_FileDialog(self): 
         app = classes.FileDialog(self)
-        app.exec()
+        #sys.exit(app.exec_())
+
+    #    app = QApplication(sys.argv)
+    #    ex = classes.FileDialog(self)
+    #    sys.exit(app.exec_())
 
 #Sonstige Funktionen 
     def openImageDetection(self):
         self.tabWidget.setCurrentIndex(1)
-        self.loadImages()
+        self.update_FilesList()
 
     def openVideoDetection(self):
         self.tabWidget.setCurrentIndex(2)
@@ -193,7 +198,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def openWebcamDetection(self):
         self.tabWidget.setCurrentIndex(3)
     
-    def loadImages(self):
+    def update_FilesList(self):
         #clear list: 
         self.list_filenames.clear()
         #assume the directory exists and contains some files and you want all jpg and JPG files
