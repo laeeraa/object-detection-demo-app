@@ -10,6 +10,7 @@ from PyQt5.QtCore import(
 
 from PyQt5.QtGui import *
 import numpy as np
+from constants.types import Filetype
 from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 from scripts.helpers import convert_cv_qt
 
@@ -51,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_model.currentIndexChanged.connect(self.model_changed)
         self.combo_collection.currentIndexChanged.connect(self.coll_changed)
         self.combo_api.currentIndexChanged.connect(self.api_changed)
-        self.btn_addImage.clicked.connect(self.open_FileDialog)
+        self.btn_addImage.clicked.connect(self.open_FileDialog_Image)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
         self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
@@ -59,6 +60,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ln_batchSize.editingFinished.connect(self.batchSize_changed)
         self.ln_outputDir.editingFinished.connect(self.outputDir_changed)
         self.ln_threshhold.editingFinished.connect(self.threshhold_changed)
+        self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
+        self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
+
     
     #check which models exist in filepath and add those to dropdown 
     def initModelOptions(self):
@@ -179,13 +183,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.imageDet.out_dir = self.ln_outputDir.text()
         print("outputDir changed to " + self.imageDet.out_dir)
 
-    def open_FileDialog(self): 
-        app = classes.FileDialog(self)
-        #sys.exit(app.exec_())
+    def open_FileDialog_Image(self ): 
+        classes.FileDialog(self, Filetype.IMAGE) 
+    def open_FileDialog_Weights(self): 
+        classes.FileDialog(self, Filetype.WEIGHTS)
+    def open_FileDialog_Configs(self): 
+        classes.FileDialog(self, Filetype.CONFIG)
 
-    #    app = QApplication(sys.argv)
-    #    ex = classes.FileDialog(self)
-    #    sys.exit(app.exec_())
 
 #Sonstige Funktionen 
     def openImageDetection(self):
@@ -239,6 +243,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog.setImage(self)
         Imagedialog.exec()
 
+    def addToStatusList(self, string): 
+        self.list_status.addItem(string)
 
 #Webcam Detection
     def startWebcam(self): 
