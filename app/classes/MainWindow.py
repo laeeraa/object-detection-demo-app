@@ -63,6 +63,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
+
+        self.combo_model.highlighted.connect(self.changeTo_MMDetModelMode)
+        self.combo_collection.highlighted.connect(self.changeTo_MMDetModelMode)
+        self.combo_usrConfig.highlighted.connect(self.changeTo_usrModelMode)
+        self.combo_usrWeights.highlighted.connect(self.changeTo_usrModelMode)
+
+        # change SizeAdjustPolicy to none instead of AdjustToContentsOnFirstShow
+        # so that it doesn't adjust once the stylesheet is changed
+        self.combo_collection.setSizeAdjustPolicy(5)
+        self.combo_model.setSizeAdjustPolicy(5)
+        self.combo_usrConfig.setSizeAdjustPolicy(5)
+        self.combo_usrWeights.setSizeAdjustPolicy(5)
+
     
     #check which models exist in filepath and add those to dropdown 
     def initModelOptions(self):
@@ -78,6 +91,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for c in self.modelHandler.collections:
             for m in c.models: 
                 self.combo_model.addItem(m.name)
+        
 
 #Init functions
     def init_CollTable(self): 
@@ -101,7 +115,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_chooseDevice.clear() 
         for g in self.modelHandler.devices: 
             self.combo_chooseDevice.addItem(g.name)
-    
+            
     def init_Params(self): 
         self.imageDet.batch_size = 1 
         self.imageDet.score_thr = 0.3
@@ -245,6 +259,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def addToStatusList(self, string): 
         self.list_status.addItem(string)
+    
+    def changeTo_usrModelMode(self): 
+        if( not self.modelHandler.usrModelMode):
+            self.modelHandler.usrModelMode = True
+            self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                border: 1px solid rgba(255, 255, 255, 0.12);")
+            self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                            border: 1px solid rgba(255, 255, 255, 0.12);")
+            self.combo_usrConfig.setStyleSheet("")
+            self.combo_usrWeights.setStyleSheet("")
+        
+    def changeTo_MMDetModelMode(self): 
+        if(self.modelHandler.usrModelMode):
+            self.modelHandler.usrModelMode = False
+            self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                border: 1px solid rgba(255, 255, 255, 0.12);")
+            self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                border: 1px solid rgba(255, 255, 255, 0.12);")
+            self.combo_collection.setStyleSheet("")
+            self.combo_model.setStyleSheet("")
+            
+
 
 #Webcam Detection
     def startWebcam(self): 

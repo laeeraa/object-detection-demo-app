@@ -22,6 +22,7 @@ class ModelHandler:
         self.devices = []
         self.usrCheckpoints = []
         self.usrConfigs = []
+        self.usrModelMode = False
 
         self.get_UserModels()
         self.init_deviceOptions()

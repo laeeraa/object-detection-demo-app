@@ -216,10 +216,26 @@ class Ui_MainWindow(object):
 "    background: #353535;\n"
 "}\n"
 "\n"
+"\n"
 "QComboBox::drop-down {\n"
 "    border: 1px solid #5A5A5A;\n"
 "    background: #353535;\n"
 "}\n"
+"\n"
+"QComboBox.disabled {\n"
+"    color: rgba(255, 255, 255, 0.3); \n"
+"    border: 1px solid rgba(255, 255, 255, 0.12);\n"
+"}\n"
+"\n"
+"QComboBox::drop-dow.disabled {\n"
+"    color: rgba(255, 255, 255, 0.3); \n"
+"    border: 1px solid rgba(255, 255, 255, 0.12);\n"
+"}\n"
+"QComboBox.disabled {\n"
+"    color: rgba(255, 255, 255, 0.3); \n"
+"    border: 1px solid rgba(255, 255, 255, 0.12);\n"
+"}\n"
+"\n"
 "\n"
 "QComboBox::down-arrow {\n"
 "    width: 3px;\n"
@@ -309,7 +325,13 @@ class Ui_MainWindow(object):
 "    font-weight:800;\n"
 "    font-style:normal;\n"
 "    background: #0F044C;\n"
-"}")
+"}\n"
+"\n"
+".disabled{\n"
+"    color: rgba(255, 255, 255, 0.3); \n"
+"    border: 1px solid rgba(255, 255, 255, 0.12);\n"
+"}\n"
+"")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
@@ -327,6 +349,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
         self.tabWidget.setSizePolicy(sizePolicy)
         self.tabWidget.setMinimumSize(QtCore.QSize(500, 0))
+        self.tabWidget.setStyleSheet("")
         self.tabWidget.setObjectName("tabWidget")
         self.tab_Home_2 = QtWidgets.QWidget()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -476,11 +499,14 @@ class Ui_MainWindow(object):
         self.btn_uploadWeights.setObjectName("btn_uploadWeights")
         self.gridLayout_2.addWidget(self.btn_uploadWeights, 8, 1, 1, 1)
         self.combo_usrWeights = QtWidgets.QComboBox(self.tab_ImageDet)
+        self.combo_usrWeights.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.combo_usrWeights.sizePolicy().hasHeightForWidth())
         self.combo_usrWeights.setSizePolicy(sizePolicy)
+        self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3);\n"
+"border: 1px solid rgba(255, 255, 255, 0.12);")
         self.combo_usrWeights.setEditable(False)
         self.combo_usrWeights.setObjectName("combo_usrWeights")
         self.gridLayout_2.addWidget(self.combo_usrWeights, 7, 1, 1, 1)
@@ -717,11 +743,14 @@ class Ui_MainWindow(object):
         self.tb_modelInfo.horizontalHeader().setMinimumSectionSize(36)
         self.gridLayout_2.addWidget(self.tb_modelInfo, 7, 5, 5, 1)
         self.combo_usrConfig = QtWidgets.QComboBox(self.tab_ImageDet)
+        self.combo_usrConfig.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.combo_usrConfig.sizePolicy().hasHeightForWidth())
         self.combo_usrConfig.setSizePolicy(sizePolicy)
+        self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3);\n"
+"border: 1px solid rgba(255, 255, 255, 0.12);")
         self.combo_usrConfig.setEditable(False)
         self.combo_usrConfig.setCurrentText("")
         self.combo_usrConfig.setObjectName("combo_usrConfig")
@@ -743,11 +772,14 @@ class Ui_MainWindow(object):
         self.btn_addImage.setObjectName("btn_addImage")
         self.gridLayout_2.addWidget(self.btn_addImage, 15, 0, 1, 1)
         self.combo_model = QtWidgets.QComboBox(self.tab_ImageDet)
+        self.combo_model.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.combo_model.sizePolicy().hasHeightForWidth())
         self.combo_model.setSizePolicy(sizePolicy)
+        self.combo_model.setStyleSheet("")
+        self.combo_model.setEditable(False)
         self.combo_model.setObjectName("combo_model")
         self.gridLayout_2.addWidget(self.combo_model, 5, 1, 1, 1)
         self.label_15 = QtWidgets.QLabel(self.tab_ImageDet)
@@ -775,12 +807,14 @@ class Ui_MainWindow(object):
         font.setItalic(False)
         font.setWeight(50)
         self.combo_collection.setFont(font)
+        self.combo_collection.setStyleSheet(".disabled {\n"
+"        color: rgba(255, 255, 255, 0.3); \n"
+"        border: 1px solid rgba(255, 255, 255, 0.12); \n"
+"}")
         self.combo_collection.setEditable(False)
+        self.combo_collection.setCurrentText("")
+        self.combo_collection.setPlaceholderText("Choose a collection")
         self.combo_collection.setObjectName("combo_collection")
-        self.combo_collection.addItem("")
-        self.combo_collection.addItem("")
-        self.combo_collection.addItem("")
-        self.combo_collection.addItem("")
         self.gridLayout_2.addWidget(self.combo_collection, 5, 0, 1, 1)
         self.btn_process = QtWidgets.QPushButton(self.tab_ImageDet)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
@@ -1009,7 +1043,7 @@ class Ui_MainWindow(object):
         self.tb_collInfo.setSortingEnabled(False)
         self.tb_collInfo.setSortingEnabled(__sortingEnabled)
         self.btn_uploadWeights.setText(_translate("MainWindow", "upload weights"))
-        self.combo_usrWeights.setPlaceholderText(_translate("MainWindow", "choose weights"))
+        self.combo_usrWeights.setPlaceholderText(_translate("MainWindow", "choose user weights"))
         self.label_2.setText(_translate("MainWindow", "Choose a collection"))
         self.label_5.setText(_translate("MainWindow", "Original Image: "))
         self.ln_batchSize.setText(_translate("MainWindow", "1"))
@@ -1044,15 +1078,11 @@ class Ui_MainWindow(object):
         __sortingEnabled = self.tb_modelInfo.isSortingEnabled()
         self.tb_modelInfo.setSortingEnabled(False)
         self.tb_modelInfo.setSortingEnabled(__sortingEnabled)
-        self.combo_usrConfig.setPlaceholderText(_translate("MainWindow", "choose model"))
+        self.combo_usrConfig.setPlaceholderText(_translate("MainWindow", "Choose user config"))
         self.btn_addImage.setText(_translate("MainWindow", "Add data"))
+        self.combo_model.setPlaceholderText(_translate("MainWindow", "choose a model"))
         self.label_15.setText(_translate("MainWindow", "Specify batchsize"))
         self.label_3.setText(_translate("MainWindow", "Choose images"))
-        self.combo_collection.setPlaceholderText(_translate("MainWindow", "Choose a model"))
-        self.combo_collection.setItemText(0, _translate("MainWindow", "Choose a model"))
-        self.combo_collection.setItemText(1, _translate("MainWindow", "Yolov3 with OpenMMLab"))
-        self.combo_collection.setItemText(2, _translate("MainWindow", "Faster rcnn r50 with OpenMMLab"))
-        self.combo_collection.setItemText(3, _translate("MainWindow", "Yolov4 with Tensorflow"))
         self.btn_process.setText(_translate("MainWindow", "Process Data"))
         self.label_10.setText(_translate("MainWindow", "or use your own "))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ImageDet), _translate("MainWindow", "Image Detection"))
