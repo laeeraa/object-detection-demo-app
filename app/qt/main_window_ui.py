@@ -327,7 +327,7 @@ class Ui_MainWindow(object):
 "    background: #0F044C;\n"
 "}\n"
 "\n"
-".disabled{\n"
+".disabled {\n"
 "    color: rgba(255, 255, 255, 0.3); \n"
 "    border: 1px solid rgba(255, 255, 255, 0.12);\n"
 "}\n"
@@ -350,6 +350,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setSizePolicy(sizePolicy)
         self.tabWidget.setMinimumSize(QtCore.QSize(500, 0))
         self.tabWidget.setStyleSheet("")
+        self.tabWidget.setElideMode(QtCore.Qt.ElideNone)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_Home_2 = QtWidgets.QWidget()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -443,9 +444,12 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.tb_collInfo.sizePolicy().hasHeightForWidth())
         self.tb_collInfo.setSizePolicy(sizePolicy)
         self.tb_collInfo.setStyleSheet("")
+        self.tb_collInfo.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.tb_collInfo.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.tb_collInfo.setTextElideMode(QtCore.Qt.ElideLeft)
         self.tb_collInfo.setShowGrid(True)
-        self.tb_collInfo.setObjectName("tb_collInfo")
         self.tb_collInfo.setColumnCount(1)
+        self.tb_collInfo.setObjectName("tb_collInfo")
         self.tb_collInfo.setRowCount(8)
         item = QtWidgets.QTableWidgetItem()
         self.tb_collInfo.setVerticalHeaderItem(0, item)
@@ -482,6 +486,7 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tb_collInfo.setItem(7, 0, item)
         self.tb_collInfo.horizontalHeader().setVisible(False)
+        self.tb_collInfo.horizontalHeader().setStretchLastSection(True)
         self.gridLayout_2.addWidget(self.tb_collInfo, 7, 4, 5, 1)
         self.btn_uploadWeights = QtWidgets.QPushButton(self.tab_ImageDet)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
@@ -713,8 +718,11 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.tb_modelInfo.sizePolicy().hasHeightForWidth())
         self.tb_modelInfo.setSizePolicy(sizePolicy)
         self.tb_modelInfo.setStyleSheet("")
-        self.tb_modelInfo.setObjectName("tb_modelInfo")
+        self.tb_modelInfo.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.tb_modelInfo.setAutoScroll(True)
+        self.tb_modelInfo.setTextElideMode(QtCore.Qt.ElideLeft)
         self.tb_modelInfo.setColumnCount(1)
+        self.tb_modelInfo.setObjectName("tb_modelInfo")
         self.tb_modelInfo.setRowCount(5)
         item = QtWidgets.QTableWidgetItem()
         self.tb_modelInfo.setVerticalHeaderItem(0, item)
@@ -741,6 +749,7 @@ class Ui_MainWindow(object):
         self.tb_modelInfo.horizontalHeader().setVisible(False)
         self.tb_modelInfo.horizontalHeader().setCascadingSectionResizes(False)
         self.tb_modelInfo.horizontalHeader().setMinimumSectionSize(36)
+        self.tb_modelInfo.horizontalHeader().setStretchLastSection(True)
         self.gridLayout_2.addWidget(self.tb_modelInfo, 7, 5, 5, 1)
         self.combo_usrConfig = QtWidgets.QComboBox(self.tab_ImageDet)
         self.combo_usrConfig.setEnabled(True)

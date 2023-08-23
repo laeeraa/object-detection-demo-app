@@ -60,6 +60,10 @@ pyuic5 -o main_window_ui.py .\Main_Window.ui
 
 #build project: 
 python -m build --wheel
+
+#create class-diagram with pyreverse
+pyreverse -o png ./app/
+
 ```
 
 

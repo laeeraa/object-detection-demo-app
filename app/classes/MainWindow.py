@@ -1,11 +1,12 @@
 import sys
+import textwrap
 from threading import Event
 import cv2
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView ) 
 
 from PyQt5.QtCore import(
-    QDir, pyqtSlot
+    QDir, Qt, pyqtSlot
 )
 
 from PyQt5.QtGui import *
@@ -49,9 +50,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
-        self.combo_model.currentIndexChanged.connect(self.model_changed)
-        self.combo_collection.currentIndexChanged.connect(self.coll_changed)
-        self.combo_api.currentIndexChanged.connect(self.api_changed)
+
         self.btn_addImage.clicked.connect(self.open_FileDialog_Image)
         self.btn_startWebcam.clicked.connect(self.startWebcam)
         self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
@@ -63,6 +62,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
+
+        # Comboboxes
+        self.combo_api.currentIndexChanged.connect(self.api_changed)
+
+
+        self.combo_model.currentIndexChanged.connect(self.model_changed)
+        self.combo_collection.currentIndexChanged.connect(self.coll_changed)
+        self.combo_usrConfig.currentIndexChanged.connect(self.usrConfig_changed)
+        self.combo_usrWeights.currentIndexChanged.connect(self.usrWeights_changed)
 
         self.combo_model.highlighted.connect(self.changeTo_MMDetModelMode)
         self.combo_collection.highlighted.connect(self.changeTo_MMDetModelMode)
@@ -96,7 +104,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 #Init functions
     def init_CollTable(self): 
         header = self.tb_collInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        #header.setSectionResizeMode(QHeaderView.ResizeToContents)
         headerV = self.tb_collInfo.verticalHeader()
         headerV.setDefaultSectionSize(37)
         headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -105,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def init_ModelTable(self): 
         header = self.tb_modelInfo.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        #header.setSectionResizeMode(QHeaderView.ResizeToContents)
         headerV = self.tb_modelInfo.verticalHeader()
         headerV.setDefaultSectionSize(37)
         headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -145,6 +153,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_ModelTable(self): 
         if(self.imageDet.model != None): 
             self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
+            # print(self.tb_modelInfo.columnWidth(1))
+            # print(self.tb_modelInfo.columnWidth(0))
+
+            # configText = '\n'.join(textwrap.wrap(self.imageDet.model.config, self.tb_modelInfo.columnWidth(0)))
+            # print(configText)
             self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
             self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
             results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
@@ -178,7 +191,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def model_changed(self): 
         if(self.combo_model.currentIndex() >= 0):
             self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
+            self.imageDet.collection = self.modelHandler.find_collection(self.imageDet.model.collection)
             self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+            self.update_ModelTable()
+    
+    def usrWeights_changed(self): 
+        if(self.combo_usrWeights.currentIndex() >= 0):
+            
+            weightsFile = self.combo_usrWeights.currentText()
+
+            if(self.imageDet.model.collection != "User"): 
+                self.imageDet.collection = classes.Collection("USER")
+                self.imageDet.model = classes.Model(
+                                        name = "", 
+                                        collection = "User", 
+                                        metadata=None, 
+                                        config = None,
+                                        weights = paths.USER_WEIGHTS + weightsFile)
+            else:
+                self.imageDet.model.weights = paths.USER_WEIGHTS + weightsFile
+            self.list_status.addItem("-model changed to " + weightsFile)
+            self.update_ModelTable()
+            self.update_CollTable()
+
+    
+    def usrConfig_changed(self): 
+        if(self.combo_usrConfig.currentIndex() >= 0):
+
+            configFile = self.combo_usrConfig.currentText()
+            name = configFile.strip(".py")
+
+            if(self.imageDet.model != None and self.imageDet.model.collection != "User"): 
+                self.imageDet.collection = classes.Collection("USER")
+
+                self.imageDet.model = classes.Model(name = name, 
+                                    collection = "User", 
+                                    metadata=None, 
+                                    config = paths.USER_CONFIGS + configFile,
+                                    weights = None)
+            else: 
+                self.imageDet.model.name = name
+                self.imageDet.model.config = paths.USER_CONFIGS+ configFile
+            self.list_status.addItem("-model changed to " + configFile)
             self.update_ModelTable()
     
     def api_changed(self): 
@@ -238,6 +292,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         path = paths.IMAGES + self.list_filenames.currentItem().text()
 
         self.list_status.addItem("processing Image...")
+        ret = None
         ret = self.imageDet.processImage(path)
         if(ret != None): 
             self.displayImageRes()
@@ -261,8 +316,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.list_status.addItem(string)
     
     def changeTo_usrModelMode(self): 
-        if( not self.modelHandler.usrModelMode):
-            self.modelHandler.usrModelMode = True
+        if( not self.imageDet.usrModelMode):
+            self.imageDet.usrModelMode = True
+            self.list_status.addItem("-Swapped to User Model Mode ")
             self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
             self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
@@ -271,8 +327,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.combo_usrWeights.setStyleSheet("")
         
     def changeTo_MMDetModelMode(self): 
-        if(self.modelHandler.usrModelMode):
-            self.modelHandler.usrModelMode = False
+        if(self.imageDet.usrModelMode):
+            self.imageDet.usrModelMode = False
+            self.list_status.addItem("-Swapped to MMDet Model Mode ")
+
             self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
             self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3); \

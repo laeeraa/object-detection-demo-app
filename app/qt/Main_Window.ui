@@ -327,7 +327,7 @@ QPushButton {
 	background: #0F044C;
 }
 
-.disabled{
+.disabled {
 	color: rgba(255, 255, 255, 0.3); 
     border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -366,6 +366,9 @@ QPushButton {
       </property>
       <property name="currentIndex">
        <number>1</number>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
       </property>
       <widget class="QWidget" name="tab_Home_2">
        <property name="sizePolicy">
@@ -573,11 +576,26 @@ p, li { white-space: pre-wrap; }
           <property name="styleSheet">
            <string notr="true"/>
           </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="textElideMode">
+           <enum>Qt::ElideLeft</enum>
+          </property>
           <property name="showGrid">
            <bool>true</bool>
           </property>
+          <property name="columnCount">
+           <number>1</number>
+          </property>
           <attribute name="horizontalHeaderVisible">
            <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
           </attribute>
           <row>
            <property name="text">
@@ -1055,6 +1073,18 @@ p, li { white-space: pre-wrap; }
           <property name="styleSheet">
            <string notr="true"/>
           </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="autoScroll">
+           <bool>true</bool>
+          </property>
+          <property name="textElideMode">
+           <enum>Qt::ElideLeft</enum>
+          </property>
+          <property name="columnCount">
+           <number>1</number>
+          </property>
           <attribute name="horizontalHeaderVisible">
            <bool>false</bool>
           </attribute>
@@ -1063,6 +1093,9 @@ p, li { white-space: pre-wrap; }
           </attribute>
           <attribute name="horizontalHeaderMinimumSectionSize">
            <number>36</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
           </attribute>
           <row>
            <property name="text">

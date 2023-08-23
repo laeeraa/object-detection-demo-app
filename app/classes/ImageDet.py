@@ -14,14 +14,14 @@ from constants import paths
 
 class ImageDet(): 
 
-    def __init__(self, parent=None):
+    def __init__(self):
         #defs for the model
         self.imagepath=""
         self.model= classes.Model(name ="YOLOV3", 
                                   collection = "User", 
                                   metadata=None, 
-                                  config = paths.USER_MODELS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", 
-                                  weights = paths.USER_MODELS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
+                                  config = paths.USER_CONFIGS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", 
+                                  weights = paths.USER_WEIGHTS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
         self.collection = classes.Collection("USER")
         self.device="cpu"
         self.palette="coco"
@@ -29,6 +29,7 @@ class ImageDet():
         self.batch_size = 1
         self.out_dir = paths.IMAGES_RES
         self.api = "OpenMMLab"
+        self.usrModelMode = False
 
     def changemodelconfig(self,model): 
         self.model = model
@@ -42,7 +43,11 @@ class ImageDet():
     
     def processImage_OpenMMLab(self,image_path):
         # build the model from a config file and a checkpoint file
-        inferencer = DetInferencer(model=self.model.name, device=self.device)
+        inferencer = None
+        if(not self.usrModelMode): 
+            inferencer = DetInferencer(model=self.model.name, device=self.device)
+        else: 
+            inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
         resultdict = inferencer(out_dir=self.out_dir, inputs=image_path, pred_score_thr=self.score_thr, batch_size=self.batch_size)
         predTable = self.getPredTable(resultdict)
 
