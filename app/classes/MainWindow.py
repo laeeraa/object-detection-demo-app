@@ -194,6 +194,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.imageDet.collection = self.modelHandler.find_collection(self.imageDet.model.collection)
             self.list_status.addItem("-model changed to " + self.combo_model.currentText())
             self.update_ModelTable()
+            self.update_CollTable()
     
     def usrWeights_changed(self): 
         if(self.combo_usrWeights.currentIndex() >= 0):
@@ -234,6 +235,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.imageDet.model.config = paths.USER_CONFIGS+ configFile
             self.list_status.addItem("-model changed to " + configFile)
             self.update_ModelTable()
+            self.update_CollTable()
     
     def api_changed(self): 
         self.imageDet.api = self.combo_api.currentText()
@@ -302,10 +304,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
     def displayImageRes(self): 
-        path =  paths.IMAGES_RES + "/vis/" + self.list_filenames.currentItem().text()
+        path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
+        self.list_status.addItem("...displaying result image at "+ path)
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
-        self.list_status.addItem("trying to display Result image")
+        self.tabWidget.setCurrentIndex(2)
 
     def openImageDialog(self): 
         Imagedialog = classes.ImageLarge(self)
