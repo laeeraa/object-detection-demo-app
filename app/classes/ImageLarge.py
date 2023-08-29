@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import (
 )
 
 import cv2
-from constants import paths
+from app.constants import paths
 
-from scripts.helpers import convert_cv_qt
+from app.scripts.helpers import convert_cv_qt
 
 class ImageLarge(QDialog):
 

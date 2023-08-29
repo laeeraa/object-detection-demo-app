@@ -9,20 +9,21 @@ sys.path.append(os.path.abspath(scriptpath))
 from mmdet.apis import DetInferencer
 from mmdet.evaluation import get_classes
 
-import classes
-from constants import paths
+from app.classes.Model import Model 
+from app.classes.Collection import Collection
+from app.constants import paths
 
 class ImageDet(): 
 
     def __init__(self):
         #defs for the model
         self.imagepath=""
-        self.model= classes.Model(name ="YOLOV3", 
+        self.model= Model(name ="YOLOV3", 
                                   collection = "User", 
                                   metadata=None, 
                                   config = paths.USER_CONFIGS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", 
                                   weights = paths.USER_WEIGHTS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
-        self.collection = classes.Collection("USER")
+        self.collection = Collection("USER")
         self.device="cpu"
         self.palette="coco"
         self.score_thr=float(0.3)
@@ -48,13 +49,18 @@ class ImageDet():
             inferencer = DetInferencer(model=self.model.name, device=self.device)
         else: 
             inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
-        resultdict = inferencer(out_dir=self.out_dir, inputs=image_path, pred_score_thr=self.score_thr, batch_size=self.batch_size)
+        resultdict = inferencer(out_dir=self.out_dir, 
+                                inputs=image_path, 
+                                pred_score_thr=self.score_thr, 
+                                batch_size=self.batch_size,
+                                no_save_pred = False)
         predTable = self.getPredTable(resultdict)
 
         return predTable
     
     def getPredTable(self, results): 
         #bbox_result = results["predictions"][0]["bboxes"]
+        print(results)
         labels = results["predictions"][0]["labels"]
         scores = results["predictions"][0]["scores"]
         classes = get_classes("coco")

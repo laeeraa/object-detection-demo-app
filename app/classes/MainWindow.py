@@ -3,7 +3,7 @@ import textwrap
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView ) 
+from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView, QTableWidgetItem ) 
 
 from PyQt5.QtCore import(
     QDir, Qt, pyqtSlot
@@ -11,15 +11,17 @@ from PyQt5.QtCore import(
 
 from PyQt5.QtGui import *
 import numpy as np
-from constants.types import Filetype
-from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
-from scripts.helpers import convert_cv_qt
+from app.constants.types import Filetype
+from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
+from app.scripts.helpers import convert_cv_qt
 
 
 
-from qt import Ui_MainWindow
-import classes
-from constants import paths
+from app.qt import Ui_MainWindow
+import app.classes as classes
+from app.constants import paths
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -292,14 +294,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def processImage(self): 
         #Bild in Funktion reinwerfen
         path = paths.IMAGES + self.list_filenames.currentItem().text()
-
+        
+        #stop sorting 
+        self.tb_predictions.sortByColumn(-1, 0)
         self.list_status.addItem("processing Image...")
         ret = None
         ret = self.imageDet.processImage(path)
         if(ret != None): 
             self.displayImageRes()
             self.ln_ObjectCount.setText("Objects detected: " + str(len(ret)))
-            self.txt_PredDump.setText("Predictions: " + str(ret))
+            self.tb_predictions.clear()
+            for i, r in enumerate(ret): 
+                self.tb_predictions.insertRow(self.tb_predictions.rowCount())
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         0, QTableWidgetItem(str(r['labelno']),0))
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         1, QTableWidgetItem("{:.2f}%".format(float(r['score'])*100),0))
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         2, QTableWidgetItem(r['labelclass'], 0))
+
+            self.tb_predictions.sortByColumn(0, 0)
+
         else: self.list_status.addItem("processing Image didnt work")
         
 

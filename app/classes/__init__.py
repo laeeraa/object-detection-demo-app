@@ -1,8 +1,10 @@
-from classes.FileDialog import FileDialog
-from classes.ImageDet import ImageDet
-from classes.ImageLarge import ImageLarge
-from classes.MainWindow import MainWindow
-from classes.Model import Model
-from classes.ModelHandler import ModelHandler
-from classes.VideoThread import VideoThread
-from classes.Collection import Collection
+__all__ = ["Collection", "FileDialog", "ImageDet", "ImageLarge", "MainWindow", "Model", "ModelHandler", "VideoThread"]
+
+from .FileDialog import FileDialog
+from .ImageDet import ImageDet
+from .ImageLarge import ImageLarge
+from .MainWindow import MainWindow
+from .Model import Model
+from .ModelHandler import ModelHandler
+from .VideoThread import VideoThread
+from .Collection import Collection
