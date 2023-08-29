@@ -38,14 +38,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
         self.connectSignalsSlots()
-        self.update_FilesList()
-        self.initModelOptions()
+
+        self.init_modelOptions()
         self.init_CollTable()
         self.init_ModelTable()
         self.init_DeviceOptions()
         self.init_Params()
         self.init_userModels()
         self.init_ImageViewer()
+
+        self.update_FilesList()
+        self.update_resultImgList()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -55,6 +58,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Btn_WebcamDet_2.clicked.connect(self.openWebcamDetection)
         self.Btn_WebcamDet_2.setIcon(QIcon("./app/assets/webcam1.png"))
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
+        self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
 
@@ -93,7 +97,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     
     #check which models exist in filepath and add those to dropdown 
-    def initModelOptions(self):
+    def init_modelOptions(self):
         #init Collections Combo Box
         self.combo_collection.clear()
         for c in self.modelHandler.collections: 
@@ -322,12 +326,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dir.setNameFilters(filters)
         for filename in dir.entryList(): 
             self.list_filenames.addItem(filename)
-        
+    
+    def update_resultImgList(self): 
+        self.list_resultDir.clear()
+        path = paths.IMAGES_RES + "/vis/"
+        dir = QDir(path)
+        #print(path)
+        filters = ["*.jpg", "*.JPG"]
+        dir.setNameFilters(filters)
+        for filename in dir.entryList(): 
+            self.list_resultDir.addItem(filename)
 
     def displayImageOrig(self): 
         path = paths.IMAGES + self.list_filenames.currentItem().text()
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
+
+    def list_resImages_event(self): 
+        path =  paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
+        self.update_ResImg(path)
 
     def processImage(self): 
         #Bild in Funktion reinwerfen
@@ -352,6 +369,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                          2, QTableWidgetItem(r['labelclass'], 0))
 
             self.tb_predictions.sortByColumn(0, 0)
+            self.update_resultImgList()
 
         else: self.list_status.addItem("processing Image didnt work")
         

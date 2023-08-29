@@ -365,7 +365,7 @@ QPushButton {
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -1416,10 +1416,10 @@ font-size: 12
          </widget>
         </item>
         <item row="4" column="2">
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="ln_resultDir"/>
         </item>
         <item row="6" column="2" rowspan="2">
-         <widget class="QListWidget" name="listWidget">
+         <widget class="QListWidget" name="list_resultDir">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
