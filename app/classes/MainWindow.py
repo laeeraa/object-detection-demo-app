@@ -22,6 +22,10 @@ import app.classes as classes
 from app.constants import paths
 
 
+from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsItemGroup, QWidget, QVBoxLayout, QSlider, QGraphicsPixmapItem
+from PyQt5.QtGui import QImage, QPixmap, QTransform
+from PyQt5.QtCore import Qt, QObject
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -41,6 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.init_DeviceOptions()
         self.init_Params()
         self.init_userModels()
+        self.init_ImageViewer()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -139,6 +144,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.combo_usrWeights.addItem(c)
         for c in self.modelHandler.usrConfigs: 
             self.combo_usrConfig.addItem(c)
+        self.combo_usrWeights.setCurrentIndex(0)
+        self.combo_usrConfig.setCurrentIndex(0)
+        self.imageDet.usrModelMode = True
+
+    def init_ImageViewer(self): 
+        self.qGScene = QGraphicsScene()
+        self.qGItemGrp = QGraphicsItemGroup()
+        qImgCat = QImage("C:\cust\Studium_local\Studienprojekt\data\images\\7.jpg").scaledToWidth(600)
+        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
+        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
+        self.qGItemGrp.addToGroup(qGItemImg)
+        self.qGScene.addItem(self.qGItemGrp)
+
+        qGView = QGraphicsView()
+        qGView.setScene(self.qGScene)
+        self.box_imageRes.addWidget(qGView, 1)
+        qSlider = QSlider(Qt.Horizontal)
+        qSlider.setRange(-100, 100)
+        self.box_imageRes.addWidget(qSlider)
+        qSlider.valueChanged.connect(self.scaleImg)
+    
+    def update_ResImg(self, image_path): 
+        self.qGScene.clear()
+        self.qGItemGrp = QGraphicsItemGroup()
+        qImgCat = QImage(image_path).scaledToWidth(600)
+        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
+        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
+        self.qGItemGrp.addToGroup(qGItemImg)
+        self.qGScene.addItem(self.qGItemGrp)
+
+    def scaleImg(self,value):
+        exp = value * 0.01
+        scl = 10.0 ** exp
+        self.qGItemGrp.setTransform(QTransform().scale(scl, scl))
 
 #update Functions
     def update_CollTable(self): 
@@ -287,7 +326,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def displayImageOrig(self): 
         path = paths.IMAGES + self.list_filenames.currentItem().text()
-
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
 
@@ -321,8 +359,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
         self.list_status.addItem("...displaying result image at "+ path)
-        im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
-        self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
+        self.update_ResImg(path)
+        #im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)   
+        #self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
         self.tabWidget.setCurrentIndex(2)
 
     def openImageDialog(self): 

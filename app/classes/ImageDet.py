@@ -1,4 +1,4 @@
-#class for processing Images with different models and different libraries
+#class for processing Images with different models
 
 import os
 import sys
@@ -21,8 +21,8 @@ class ImageDet():
         self.model= Model(name ="YOLOV3", 
                                   collection = "User", 
                                   metadata=None, 
-                                  config = paths.USER_CONFIGS+"YOLOV3/yolov3_mobilenetv2_320_300e_coco.py", 
-                                  weights = paths.USER_WEIGHTS + "VOLOV3/yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth" )
+                                  config = paths.USER_CONFIGS+"rtmdet_tiny_8xb32-300e_coco.py", 
+                                  weights = paths.USER_WEIGHTS + "rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth")
         self.collection = Collection("USER")
         self.device="cpu"
         self.palette="coco"
@@ -30,7 +30,7 @@ class ImageDet():
         self.batch_size = 1
         self.out_dir = paths.IMAGES_RES
         self.api = "OpenMMLab"
-        self.usrModelMode = False
+        self.usrModelMode = True
 
     def changemodelconfig(self,model): 
         self.model = model
@@ -79,7 +79,3 @@ class ImageDet():
             i+= 1
         print(predtable)
         return predtable
-
-
-
-
