@@ -1,9 +1,61 @@
-# Demonstrator for Object Detection using OpenMMLab
+# PyQT Desktop-App for Object Detection using OpenMMLab
+This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images and videos. 
 
-# Setting up Anaconda Environment
+## Setting up
+### Setup Anaconda Environment
+```bash
+sudo choco install miniconda3 --params="'/AddToPath:1'"
+
+#initialize anaconda
+conda init
+
+#setting up anaconda environment
+conda env create -f ./setup/environment.yml --prefix ./env 
+conda activate ./env
+
+```
+### Setup OpenMMLab
+```bash
+#Setup OpenMMLab
+Expand-Archive ./packages/mmdetection-main.zip -DestinationPath ./OpenMMLab
+
+cd mmdetection
+pip install -v -e .
+
+#Verify Installation of mmdetection: 
+mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest .
+python demo/image_demo.py demo/demo.jpg rtmdet_tiny_8xb32-300e_coco.py --weights rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth --device cpu
+
+```
+
+
+## StartBefehle
 
 ```bash
-#setting up anaconda environment
+#start app: 
+python .\app\app.py
+#start pyqt5 designer
+pyqt5-tools designer
+
+#convert newest qt-file to python: 
+pyuic5 -o main_window_ui.py .\Main_Window.ui
+
+#build project: 
+python -m build --wheel
+
+#create class-diagram with pyreverse
+pyreverse -o png ./app/
+
+```
+## Some Examples 
+![Alt text](./documentation/image-1.png)
+![Alt text](./documentation/image.png)
+
+
+
+# Anaconda Environment aufbauen 
+ 
+```bash
 conda create --name demonstrator_v1 python=3.8 -y
 conda activate demonstrator_v1
 
@@ -44,32 +96,4 @@ pip install pyqt5-tools
 
 #Python Build tool 
 pip install build 
-```
-
-### StartBefehle
-
-```bash
-#start pyqt5 designer
-pyqt5-tools designer
-
-#start app: 
-python .UI\app.py
-
-#convert newest qt-file to python: 
-pyuic5 -o main_window_ui.py .\Main_Window.ui
-
-#build project: 
-python -m build --wheel
-
-#create class-diagram with pyreverse
-pyreverse -o png ./app/
-
-```
-
-
-# Anaconda Environment aufbauen 
- 
-```
-conda env create -f ./setup/environment.yml --prefix ./env 
-conda activate ./env
 ```
