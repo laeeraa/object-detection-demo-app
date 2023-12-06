@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFil
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
-from constants import paths
+from app.constants import paths
 
-from constants.types import Filetype
+from app.constants.types import Filetype
 
 class FileDialog(QDialog):
 

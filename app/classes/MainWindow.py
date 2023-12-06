@@ -3,7 +3,7 @@ import textwrap
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView ) 
+from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView, QTableWidgetItem ) 
 
 from PyQt5.QtCore import(
     QDir, Qt, pyqtSlot
@@ -11,15 +11,21 @@ from PyQt5.QtCore import(
 
 from PyQt5.QtGui import *
 import numpy as np
-from constants.types import Filetype
-from packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
-from scripts.helpers import convert_cv_qt
+from app.constants.types import Filetype
+from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
+from app.scripts.helpers import convert_cv_qt
 
 
 
-from qt import Ui_MainWindow
-import classes
-from constants import paths
+from app.qt import Ui_MainWindow
+import app.classes as classes
+from app.constants import paths
+
+
+from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsItemGroup, QWidget, QVBoxLayout, QSlider, QGraphicsPixmapItem
+from PyQt5.QtGui import QImage, QPixmap, QTransform
+from PyQt5.QtCore import Qt, QObject
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -32,13 +38,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
         self.connectSignalsSlots()
-        self.update_FilesList()
-        self.initModelOptions()
+
+        self.init_modelOptions()
         self.init_CollTable()
         self.init_ModelTable()
         self.init_DeviceOptions()
         self.init_Params()
         self.init_userModels()
+        self.init_ImageViewer()
+
+        self.update_FilesList()
+        self.update_resultImgList()
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -48,6 +58,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Btn_WebcamDet_2.clicked.connect(self.openWebcamDetection)
         self.Btn_WebcamDet_2.setIcon(QIcon("./app/assets/webcam1.png"))
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
+        self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
         self.btn_process.clicked.connect(self.processImage)
         self.btn_openImageDialog.clicked.connect(self.openImageDialog)
 
@@ -86,7 +97,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     
     #check which models exist in filepath and add those to dropdown 
-    def initModelOptions(self):
+    def init_modelOptions(self):
         #init Collections Combo Box
         self.combo_collection.clear()
         for c in self.modelHandler.collections: 
@@ -137,6 +148,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.combo_usrWeights.addItem(c)
         for c in self.modelHandler.usrConfigs: 
             self.combo_usrConfig.addItem(c)
+        self.combo_usrWeights.setCurrentIndex(0)
+        self.combo_usrConfig.setCurrentIndex(0)
+        self.imageDet.usrModelMode = True
+
+    def init_ImageViewer(self): 
+        self.qGScene = QGraphicsScene()
+        self.qGItemGrp = QGraphicsItemGroup()
+        qImgCat = QImage("C:\cust\Studium_local\Studienprojekt\data\images\\7.jpg").scaledToWidth(600)
+        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
+        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
+        self.qGItemGrp.addToGroup(qGItemImg)
+        self.qGScene.addItem(self.qGItemGrp)
+
+        qGView = QGraphicsView()
+        qGView.setScene(self.qGScene)
+        self.box_imageRes.addWidget(qGView, 1)
+        qSlider = QSlider(Qt.Horizontal)
+        qSlider.setRange(-100, 100)
+        self.box_imageRes.addWidget(qSlider)
+        qSlider.valueChanged.connect(self.scaleImg)
+    
+    def update_ResImg(self, image_path): 
+        self.qGScene.clear()
+        self.qGItemGrp = QGraphicsItemGroup()
+        qImgCat = QImage(image_path).scaledToWidth(600)
+        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
+        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
+        self.qGItemGrp.addToGroup(qGItemImg)
+        self.qGScene.addItem(self.qGItemGrp)
+
+    def scaleImg(self,value):
+        exp = value * 0.01
+        scl = 10.0 ** exp
+        self.qGItemGrp.setTransform(QTransform().scale(scl, scl))
 
 #update Functions
     def update_CollTable(self): 
@@ -281,33 +326,60 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dir.setNameFilters(filters)
         for filename in dir.entryList(): 
             self.list_filenames.addItem(filename)
-        
+    
+    def update_resultImgList(self): 
+        self.list_resultDir.clear()
+        path = paths.IMAGES_RES + "/vis/"
+        dir = QDir(path)
+        #print(path)
+        filters = ["*.jpg", "*.JPG"]
+        dir.setNameFilters(filters)
+        for filename in dir.entryList(): 
+            self.list_resultDir.addItem(filename)
 
     def displayImageOrig(self): 
         path = paths.IMAGES + self.list_filenames.currentItem().text()
-
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
+
+    def list_resImages_event(self): 
+        path =  paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
+        self.update_ResImg(path)
 
     def processImage(self): 
         #Bild in Funktion reinwerfen
         path = paths.IMAGES + self.list_filenames.currentItem().text()
-
+        
+        #stop sorting 
+        self.tb_predictions.sortByColumn(-1, 0)
         self.list_status.addItem("processing Image...")
         ret = None
         ret = self.imageDet.processImage(path)
         if(ret != None): 
             self.displayImageRes()
             self.ln_ObjectCount.setText("Objects detected: " + str(len(ret)))
-            self.txt_PredDump.setText("Predictions: " + str(ret))
+            self.tb_predictions.clear()
+            for i, r in enumerate(ret): 
+                self.tb_predictions.insertRow(self.tb_predictions.rowCount())
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         0, QTableWidgetItem(str(r['labelno']),0))
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         1, QTableWidgetItem("{:.2f}%".format(float(r['score'])*100),0))
+                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                         2, QTableWidgetItem(r['labelclass'], 0))
+
+            self.tb_predictions.sortByColumn(0, 0)
+            self.update_resultImgList()
+
         else: self.list_status.addItem("processing Image didnt work")
         
 
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
         self.list_status.addItem("...displaying result image at "+ path)
-        im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
-        self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
+        self.update_ResImg(path)
+        #im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)   
+        #self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
         self.tabWidget.setCurrentIndex(2)
 
     def openImageDialog(self): 

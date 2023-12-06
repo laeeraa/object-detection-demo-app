@@ -3,8 +3,13 @@ from PyQt5.QtWidgets import (
     QApplication
 )
 
+project_home = 'C:\cust\Studium_local\Studienprojekt'
+if project_home not in sys.path:
+    sys.path = [project_home] + sys.path
+print(sys.path)
 
-from classes.MainWindow import MainWindow
+
+from app.classes.MainWindow import MainWindow
 
 
 import ctypes

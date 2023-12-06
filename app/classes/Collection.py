@@ -1,5 +1,5 @@
-from classes.Model import Model
-from scripts.helpers import get_field
+from app.classes.Model import Model
+from app.scripts.helpers import get_field
 import json
 
 class Metadata:

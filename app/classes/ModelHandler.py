@@ -1,8 +1,8 @@
 import os
 import yaml
-from classes.Collection import Collection
-from constants import paths
-from classes.Model import Model, Result
+from app.classes.Collection import Collection
+from app.constants import paths
+from app.classes.Model import Model, Result
 import cpuinfo  
 import torch  
 
