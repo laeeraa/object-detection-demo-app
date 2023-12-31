@@ -2,7 +2,7 @@ import os;
 
 workingdir = os.getcwd().replace("\\", "/")
 
-MMDET_MODELS = workingdir +"/app/packages/OpenMMLab/mmdetection/configs/"
+MMDET_MODELS = workingdir +"/app/packages/OpenMMLab/mmdetection-main/configs/"
 USER_MODELS = workingdir + "/data/models/"
 
 USER_WEIGHTS = USER_MODELS + "checkpoints/"

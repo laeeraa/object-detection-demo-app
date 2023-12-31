@@ -2,32 +2,66 @@
 This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images and videos. 
 
 ## Setting up
-### Setup Anaconda Environment
+### Setup Anaconda Environment Windows
 ```bash
-sudo choco install miniconda3 --params="'/AddToPath:1'"
+#download SetUP: 
+curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -o miniconda.exe
+#Run Setup
+start .\miniconda.exe
+#delete setup again
+del miniconda.exe
 
-#initialize anaconda
+
+#ggf zur Path Variable hinzufügen: 
+"c:\tools\miniconda3"
+"c:\tools\miniconda3\Scripts"
+
+#initialize anaconda in Command Line
 conda init
 
 #setting up anaconda environment
 conda env create -f ./setup/environment.yml --prefix ./env 
 conda activate ./env
 
+#ggf. noch: 
+conda env update --file local.yml --prune
 ```
+
+##pip installs
+```bash
+#für Handgesture Recognizer
+pip install mediapipe 
+
+#für YoloV4
+pip install tensorflow
+pip install tf2-yolov4
+
+#QT5
+pip install pyqt5-tools 
+
+#Python Build tool 
+pip install build 
+
+pip install py-cpuinfo
+```
+
 ### Setup OpenMMLab
 ```bash
 #Setup OpenMMLab
-Expand-Archive ./packages/mmdetection-main.zip -DestinationPath ./OpenMMLab
+Expand-Archive ./setup/packages/mmdetection.zip -DestinationPath ./app/packages/OpenMMLab
 
-cd mmdetection
+pip install -U openmim
+mim install mmengine
+mim install "mmcv=2.0.0"
+
+
+cd ./app/packages/OpenMMLab/mmdetection-main
 pip install -v -e .
 
-#Verify Installation of mmdetection: 
+#Verify Installation of mmdetection check for result in ./outputs/vis/demo.jpg 
 mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest .
 python demo/image_demo.py demo/demo.jpg rtmdet_tiny_8xb32-300e_coco.py --weights rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth --device cpu
-
 ```
-
 
 ## StartBefehle
 

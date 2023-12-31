@@ -3,10 +3,16 @@ from PyQt5.QtWidgets import (
     QApplication
 )
 
-project_home = 'C:\cust\Studium_local\Studienprojekt'
-if project_home not in sys.path:
-    sys.path = [project_home] + sys.path
-print(sys.path)
+import os
+
+# get the current working directory
+current_working_directory = os.getcwd()
+
+# print output to the console
+print(current_working_directory)
+if current_working_directory not in sys.path:
+    sys.path = [current_working_directory] + sys.path
+#print(sys.path)
 
 
 from app.classes.MainWindow import MainWindow
