@@ -80,6 +80,12 @@ python -m build --wheel
 #create class-diagram with pyreverse
 pyreverse -o png ./app/
 
+#freeze pip requirements: 
+pip list --format=freeze > requirements.txt
+
+#freeze anaconda environment: 
+conda env export > ./setup/environment.yml
+
 ```
 ## Some Examples 
 ![Alt text](./documentation/image-1.png)
