@@ -3,10 +3,10 @@ import sys
 from mmdet.evaluation.functional.class_names import get_classes
 
 # add your project directory to the sys.path
-project_home = 'C:\cust\Studium_local\Studienprojekt'
-if project_home not in sys.path:
-    sys.path = [project_home] + sys.path
-print(sys.path)
+current_working_directory = os.getcwd()
+
+if current_working_directory not in sys.path:
+    sys.path = [current_working_directory] + sys.path
 
 from app.classes.Model import Model
 from app.constants import paths

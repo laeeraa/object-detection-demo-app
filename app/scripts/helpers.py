@@ -46,7 +46,8 @@ def parse_metafile(json_string):
 
 def get_field(json, field): 
         try: 
-            if json[field]: return json[field]
-        except (KeyError,TypeError):
-            print("Some Error: ")
+            if json[field]: 
+                return json[field]
+        except Exception as err:
+            (f"Unexpected Error {err} of Type: {type(err)}")
             return ""

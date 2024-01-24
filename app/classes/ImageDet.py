@@ -45,25 +45,27 @@ class ImageDet():
     def processImage_OpenMMLab(self,image_path):
         # build the model from a config file and a checkpoint file
         inferencer = None
+        if(not self.usrModelMode): 
+            inferencer = DetInferencer(model=self.model.name, device=self.device)
+        else: 
+            inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
+        
         try: 
-            if(not self.usrModelMode): 
-                inferencer = DetInferencer(model=self.model.name, device=self.device)
-            else: 
-                inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
+            resultdict = inferencer(out_dir=self.out_dir, 
+                            inputs=image_path, 
+                            pred_score_thr=self.score_thr, 
+                            batch_size=self.batch_size,
+                            no_save_pred = False)
         except Exception as e: 
-            return (-1, e) 
-        resultdict = inferencer(out_dir=self.out_dir, 
-                                inputs=image_path, 
-                                pred_score_thr=self.score_thr, 
-                                batch_size=self.batch_size,
-                                no_save_pred = False)
-        predTable = self.getPredTable(resultdict)
-
-        return (1, predTable)
+            return(-1, e)
+        else: 
+            predTable = self.getPredTable(resultdict)
+            return (1, predTable)
+        
     
     def getPredTable(self, results): 
         #bbox_result = results["predictions"][0]["bboxes"]
-        print(results)
+        #print(results)
         labels = results["predictions"][0]["labels"]
         scores = results["predictions"][0]["scores"]
         classes = get_classes("coco")
@@ -80,5 +82,5 @@ class ImageDet():
                 }
                 predtable.append(pred)
             i+= 1
-        print(predtable)
+        #print(predtable)
         return predtable

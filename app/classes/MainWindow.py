@@ -199,15 +199,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_log_window(self, message, log_level): 
         item = QListWidgetItem(message, self.list_status)
         item.setBackground(QColor(LogColor[log_level.name].value))
+        self.list_status.scrollToBottom()
 
     def update_ModelTable(self): 
         if(self.imageDet.model != None): 
             self.tb_modelInfo.item(0,0).setText(self.imageDet.model.name)
-            # print(self.tb_modelInfo.columnWidth(1))
-            # print(self.tb_modelInfo.columnWidth(0))
-
-            # configText = '\n'.join(textwrap.wrap(self.imageDet.model.config, self.tb_modelInfo.columnWidth(0)))
-            # print(configText)
             self.tb_modelInfo.item(1,0).setText(self.imageDet.model.config)
             self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
             results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
@@ -229,10 +225,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def device_changed(self): 
         self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
-        print("Device changed to: " + self.imageDet.device)
+        self.logger.log("Device changed to: " + self.imageDet.device, LogLevel.INFO)
     
     def update_models(self): 
-         #init Model ComboBox
+        #init Model ComboBox
         self.combo_model.clear()
         self.imageDet.model = None; 
         for m in self.imageDet.collection.models:
@@ -242,7 +238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if(self.combo_model.currentIndex() >= 0):
             self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
             self.imageDet.collection = self.modelHandler.find_collection(self.imageDet.model.collection)
-            self.list_status.addItem("-model changed to " + self.combo_model.currentText())
+            self.logger.log("model changed to " + self.combo_model.currentText(), LogLevel.INFO)
             self.update_ModelTable()
             self.update_CollTable()
     
@@ -261,7 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                         weights = paths.USER_WEIGHTS + weightsFile)
             else:
                 self.imageDet.model.weights = paths.USER_WEIGHTS + weightsFile
-            self.list_status.addItem("-model changed to " + weightsFile)
+            self.logger.log("weights changed to " + weightsFile, LogLevel.INFO)
             self.update_ModelTable()
             self.update_CollTable()
 
@@ -283,30 +279,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else: 
                 self.imageDet.model.name = name
                 self.imageDet.model.config = paths.USER_CONFIGS+ configFile
-            self.list_status.addItem("-model changed to " + configFile)
+            self.logger.log("model changed to " + configFile, LogLevel.INFO)
             self.update_ModelTable()
             self.update_CollTable()
     
     def api_changed(self): 
         self.imageDet.api = self.combo_api.currentText()
-        self.list_status.addItem("-API changed to " + self.combo_api.currentText())
+        self.logger.log("API changed to " + self.combo_api.currentText(), LogLevel.INFO)
 
     def batchSize_changed(self): 
         self.imageDet.batch_size = float(self.ln_batchSize.text())
-        print("Batchsize changed to " + str(self.imageDet.batch_size))
+        self.logger.log("Batchsize changed to " + str(self.imageDet.batch_size), LogLevel.DEBUG)
     
     def threshhold_changed(self): 
         self.imageDet.score_thr = float(self.ln_threshhold.text())
-        print("Thresshold changed to "+ str(self.imageDet.score_thr))
+        self.logger.log("Thresshold changed to "+ str(self.imageDet.score_thr), LogLevel.DEBUG)
     
     def outputDir_changed(self): 
         self.imageDet.out_dir = self.ln_outputDir.text()
-        print("outputDir changed to " + self.imageDet.out_dir)
+        self.logger.log("outputDir changed to " + self.imageDet.out_dir, LogLevel.DEBUG)
 
     def open_FileDialog_Image(self ): 
         classes.FileDialog(self, Filetype.IMAGE) 
+
     def open_FileDialog_Weights(self): 
         classes.FileDialog(self, Filetype.WEIGHTS)
+
     def open_FileDialog_Configs(self): 
         classes.FileDialog(self, Filetype.CONFIG)
 
@@ -360,18 +358,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try: 
             path = paths.IMAGES + self.list_filenames.currentItem().text()
         except Exception as err: 
-            self.list_status.addItem("No Image selected")
-            #item.setBackground(QColor(255,0,0))
+            self.logger.log("Specified Imagepath could not be read", LogLevel.WARNING)
             return
+
         #stop sorting 
         self.tb_predictions.sortByColumn(-1, 0)
-        self.list_status.addItem("processing Image...")
+        self.logger.log("processing Image...", LogLevel.INFO)
+
         ret = self.imageDet.processImage(path)
         if ret[0] == -1:
-            #an exception occured 
+            #an error occured 
             err = ret[1]
-            item = QListWidgetItem((f"Unexpected Error{err=}, {type(err)=}"),self.list_status)
-            item.setBackground(QColor(255,0,0))
+            self.logger.log(err, LogLevel.ERROR)
             return
         elif(ret[1] != None): 
             self.displayImageRes()
@@ -389,14 +387,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tb_predictions.sortByColumn(0, 0)
             self.update_resultImgList()
         else: 
-            self.list_status.addItem("No results found")
+            self.logger.log("No objects detected", LogLevel.WARNING )
 
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
-        self.list_status.addItem("...displaying result image at "+ path)
+        self.logger.log("displaying result image at " + path, LogLevel.DEBUG)
         self.update_ResImg(path)
-        #im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)   
-        #self.lb_image_res.setPixmap(convert_cv_qt(im_cv))
         self.tabWidget.setCurrentIndex(2)
 
     def openImageDialog(self): 
@@ -404,13 +400,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog.setImage(self)
         Imagedialog.exec()
 
-    def addToStatusList(self, string): 
-        self.list_status.addItem(string)
     
     def changeTo_usrModelMode(self): 
         if( not self.imageDet.usrModelMode):
             self.imageDet.usrModelMode = True
-            self.list_status.addItem("-Swapped to User Model Mode ")
+            self.logger.log("Swapped to User Model Mode", LogLevel.DEBUG)
             self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
             self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
@@ -421,7 +415,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def changeTo_MMDetModelMode(self): 
         if(self.imageDet.usrModelMode):
             self.imageDet.usrModelMode = False
-            self.list_status.addItem("-Swapped to MMDet Model Mode ")
+            self.logger.log("Swapped to MMDet Model Mode", LogLevel.DEBUG)
 
             self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
@@ -429,8 +423,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
             self.combo_collection.setStyleSheet("")
             self.combo_model.setStyleSheet("")
-            
-
 
 #Webcam Detection
     def startWebcam(self): 

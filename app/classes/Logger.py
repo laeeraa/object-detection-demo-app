@@ -15,9 +15,9 @@ class Logger:
     def log(self, err, log_level):
         if log_level.value >= self.level.value:
             message = " "
-            if log_level.value < LogLevel.ERROR
+            if log_level.value < LogLevel.ERROR.value:
                 message = (f"[{log_level.name}] {err}")
             else: 
-                message = (f"Unexpected Error {err=} of Type: {type(err)=}")
+                message = (f"Unexpected Error {err} of Type: {type(err)}")
             self.signalEmitter.message_logged.emit(message, log_level)
 

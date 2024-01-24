@@ -28,16 +28,14 @@ class FileDialog(QDialog):
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        #self.setWindowFlags(Qt.WA_DeleteOnClose)
     
-        #self.openFileNameDialog()
         self.openFileNamesDialog()
-        #self.saveFileDialog()
 
         #self.show()
     
     def openFileNamesDialog(self):
         copyTo = paths.IMAGES
+
         typesString = "Image files (*.png *.xpm *.jpg)"
         if (self.type == Filetype.IMAGE):
             copyTo = paths.IMAGES
@@ -49,30 +47,22 @@ class FileDialog(QDialog):
             copyTo = paths.USER_WEIGHTS
             typesString = "Checkpoint files (*.pth)"
 
-
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "",typesString, options=options)
+        
         #called when open button is pushed in file dialog
         if files:
-            print("Adding files to data directory")
-            print(files)
+            self.parent.logger.log("Adding files to data directory", LogLevel.INFO)
             try: 
                 for f in files: 
                     shutil.copy2(f, copyTo)
+                self.done(1)
+                self.parent.update_FilesList()
+                return 0
             except Exception as e: 
-                self.parent.addToStatusList("Something went wrong copying the pictures into the specified directory %s\n %s", {self.copyTo, e})
-        self.done(1)
-        self.parent.update_FilesList()
-        return 0
-        
-    
-    def saveFileDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Text Files (*.txt)", options=options)
-        if fileName:
-            print(fileName)
+                self.parent.logger.WARNING("Something went wrong copying the pictures into the specified directory %s\n %s", {self.copyTo, e})
+                return -1
 
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)
