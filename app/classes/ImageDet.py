@@ -82,5 +82,4 @@ class ImageDet():
                 }
                 predtable.append(pred)
             i+= 1
-        #print(predtable)
         return predtable

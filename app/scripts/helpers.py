@@ -49,5 +49,5 @@ def get_field(json, field):
             if json[field]: 
                 return json[field]
         except Exception as err:
-            (f"Unexpected Error {err} of Type: {type(err)}")
+            (f"Unexpected Error: {err} of Type: {type(err)}")
             return ""
