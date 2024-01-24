@@ -3,7 +3,7 @@ import textwrap
 from threading import Event
 import cv2
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView, QTableWidgetItem ) 
+from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView, QTableWidgetItem, QListWidgetItem ) 
 
 from PyQt5.QtCore import(
     QDir, Qt, pyqtSlot
@@ -11,7 +11,7 @@ from PyQt5.QtCore import(
 
 from PyQt5.QtGui import *
 import numpy as np
-from app.constants.types import Filetype
+from app.constants.types import Filetype, LogLevel
 from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 from app.scripts.helpers import convert_cv_qt
 
@@ -20,6 +20,7 @@ from app.scripts.helpers import convert_cv_qt
 from app.qt import Ui_MainWindow
 import app.classes as classes
 from app.constants import paths
+from app.constants.types import LogLevel, LogColor
 
 
 from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsItemGroup, QWidget, QVBoxLayout, QSlider, QGraphicsPixmapItem
@@ -39,6 +40,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.connectSignalsSlots()
 
+        #setup logger
+        self.logger = classes.Logger(level=LogLevel.INFO)
+        self.logger.signalEmitter.message_logged.connect(self.update_log_window)
+
         self.init_modelOptions()
         self.init_CollTable()
         self.init_ModelTable()
@@ -49,6 +54,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_FilesList()
         self.update_resultImgList()
+        self.logger.log("The MainWindow has been initialized", LogLevel.INFO)
 
     def connectSignalsSlots(self):
         self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
@@ -73,11 +79,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
-
         # Comboboxes
         self.combo_api.currentIndexChanged.connect(self.api_changed)
-
-
         self.combo_model.currentIndexChanged.connect(self.model_changed)
         self.combo_collection.currentIndexChanged.connect(self.coll_changed)
         self.combo_usrConfig.currentIndexChanged.connect(self.usrConfig_changed)
@@ -94,7 +97,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_model.setSizeAdjustPolicy(5)
         self.combo_usrConfig.setSizeAdjustPolicy(5)
         self.combo_usrWeights.setSizeAdjustPolicy(5)
-
     
     #check which models exist in filepath and add those to dropdown 
     def init_modelOptions(self):
@@ -194,6 +196,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tb_collInfo.item(6,0).setText(self.imageDet.collection.readme)
         self.tb_collInfo.item(7,0).setText(str(self.imageDet.collection.code))
 
+    def update_log_window(self, message, log_level): 
+        item = QListWidgetItem(message, self.list_status)
+        item.setBackground(QColor(LogColor[log_level.name].value))
 
     def update_ModelTable(self): 
         if(self.imageDet.model != None): 
@@ -320,12 +325,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_FilesList(self):
         #clear list: 
         self.list_filenames.clear()
-        #assume the directory exists and contains some files and you want all jpg and JPG files
-        dir = QDir(paths.IMAGES)
-        filters = ["*.jpg", "*.JPG"]
-        dir.setNameFilters(filters)
-        for filename in dir.entryList(): 
-            self.list_filenames.addItem(filename)
+        
+        try: 
+            #assume the directory exists and contains some files and you want all jpg and JPG files
+            dir = QDir(paths.IMAGES)
+            filters = ["*.jpg", "*.JPG"]
+            dir.setNameFilters(filters)
+            for filename in dir.entryList(): 
+                self.list_filenames.addItem(filename)
+        except Exception as err: 
+            return
     
     def update_resultImgList(self): 
         self.list_resultDir.clear()
@@ -348,18 +357,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def processImage(self): 
         #Bild in Funktion reinwerfen
-        path = paths.IMAGES + self.list_filenames.currentItem().text()
-        
+        try: 
+            path = paths.IMAGES + self.list_filenames.currentItem().text()
+        except Exception as err: 
+            self.list_status.addItem("No Image selected")
+            #item.setBackground(QColor(255,0,0))
+            return
         #stop sorting 
         self.tb_predictions.sortByColumn(-1, 0)
         self.list_status.addItem("processing Image...")
-        ret = None
         ret = self.imageDet.processImage(path)
-        if(ret != None): 
+        if ret[0] == -1:
+            #an exception occured 
+            err = ret[1]
+            item = QListWidgetItem((f"Unexpected Error{err=}, {type(err)=}"),self.list_status)
+            item.setBackground(QColor(255,0,0))
+            return
+        elif(ret[1] != None): 
             self.displayImageRes()
-            self.ln_ObjectCount.setText("Objects detected: " + str(len(ret)))
+            self.ln_ObjectCount.setText("Objects detected: " + str(len(ret[1])))
             self.tb_predictions.clear()
-            for i, r in enumerate(ret): 
+            for i, r in enumerate(ret[1]): 
                 self.tb_predictions.insertRow(self.tb_predictions.rowCount())
                 self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
                          0, QTableWidgetItem(str(r['labelno']),0))
@@ -370,9 +388,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.tb_predictions.sortByColumn(0, 0)
             self.update_resultImgList()
-
-        else: self.list_status.addItem("processing Image didnt work")
-        
+        else: 
+            self.list_status.addItem("No results found")
 
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()

@@ -18,7 +18,7 @@ class ImageDet():
     def __init__(self):
         #defs for the model
         self.imagepath=""
-        self.model= Model(name ="YOLOV3", 
+        self.model = Model(name ="YOLOV3", 
                                   collection = "User", 
                                   metadata=None, 
                                   config = paths.USER_CONFIGS+"rtmdet_tiny_8xb32-300e_coco.py", 
@@ -45,10 +45,13 @@ class ImageDet():
     def processImage_OpenMMLab(self,image_path):
         # build the model from a config file and a checkpoint file
         inferencer = None
-        if(not self.usrModelMode): 
-            inferencer = DetInferencer(model=self.model.name, device=self.device)
-        else: 
-            inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
+        try: 
+            if(not self.usrModelMode): 
+                inferencer = DetInferencer(model=self.model.name, device=self.device)
+            else: 
+                inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
+        except Exception as e: 
+            return (-1, e) 
         resultdict = inferencer(out_dir=self.out_dir, 
                                 inputs=image_path, 
                                 pred_score_thr=self.score_thr, 
@@ -56,7 +59,7 @@ class ImageDet():
                                 no_save_pred = False)
         predTable = self.getPredTable(resultdict)
 
-        return predTable
+        return (1, predTable)
     
     def getPredTable(self, results): 
         #bbox_result = results["predictions"][0]["bboxes"]
