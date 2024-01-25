@@ -86,10 +86,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_usrConfig.currentIndexChanged.connect(self.usrConfig_changed)
         self.combo_usrWeights.currentIndexChanged.connect(self.usrWeights_changed)
 
-        self.combo_model.highlighted.connect(self.changeTo_MMDetModelMode)
-        self.combo_collection.highlighted.connect(self.changeTo_MMDetModelMode)
-        self.combo_usrConfig.highlighted.connect(self.changeTo_usrModelMode)
-        self.combo_usrWeights.highlighted.connect(self.changeTo_usrModelMode)
+        self.combo_model.activated.connect(self.changeTo_MMDetModelMode)
+        self.combo_collection.activated.connect(self.changeTo_MMDetModelMode)
+        self.combo_usrConfig.activated.connect(self.changeTo_usrModelMode)
+        self.combo_usrWeights.activated.connect(self.changeTo_usrModelMode)
 
         # change SizeAdjustPolicy to none instead of AdjustToContentsOnFirstShow
         # so that it doesn't adjust once the stylesheet is changed
@@ -157,11 +157,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def init_ImageViewer(self): 
         self.qGScene = QGraphicsScene()
         self.qGItemGrp = QGraphicsItemGroup()
-        qImgCat = QImage("C:\cust\Studium_local\Studienprojekt\data\images\\7.jpg").scaledToWidth(600)
-        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
-        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
-        self.qGItemGrp.addToGroup(qGItemImg)
-        self.qGScene.addItem(self.qGItemGrp)
 
         qGView = QGraphicsView()
         qGView.setScene(self.qGScene)
@@ -174,9 +169,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_ResImg(self, image_path): 
         self.qGScene.clear()
         self.qGItemGrp = QGraphicsItemGroup()
-        qImgCat = QImage(image_path).scaledToWidth(600)
-        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImgCat))
-        qGItemImg.setTransform(QTransform().translate(-0.5 * qImgCat.width(), -0.5 * qImgCat.height()))
+        qImg = QImage(image_path).scaledToWidth(600)
+        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImg))
+        qGItemImg.setTransform(QTransform().translate(-0.5 * qImg.width(), -0.5 * qImg.height()))
         self.qGItemGrp.addToGroup(qGItemImg)
         self.qGScene.addItem(self.qGItemGrp)
 
@@ -243,45 +238,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update_CollTable()
     
     def usrWeights_changed(self): 
-        if(self.combo_usrWeights.currentIndex() >= 0):
-            
-            weightsFile = self.combo_usrWeights.currentText()
+        try: 
+            if(self.combo_usrWeights.currentIndex() >= 0):
+                
+                weightsFile = self.combo_usrWeights.currentText()
 
-            if(self.imageDet.model.collection != "User"): 
-                self.imageDet.collection = classes.Collection("USER")
-                self.imageDet.model = classes.Model(
-                                        name = "", 
-                                        collection = "User", 
-                                        metadata=None, 
-                                        config = None,
-                                        weights = paths.USER_WEIGHTS + weightsFile)
-            else:
-                self.imageDet.model.weights = paths.USER_WEIGHTS + weightsFile
-            self.logger.log("weights changed to " + weightsFile, LogLevel.INFO)
-            self.update_ModelTable()
-            self.update_CollTable()
-
+                if(self.imageDet.model.collection != "User"): 
+                    self.imageDet.collection = classes.Collection("USER")
+                    self.imageDet.model = classes.Model(
+                                            name = "", 
+                                            collection = "User", 
+                                            metadata=None, 
+                                            config = None,
+                                            weights = paths.USER_WEIGHTS + weightsFile)
+                else:
+                    self.imageDet.model.weights = paths.USER_WEIGHTS + weightsFile
+                self.logger.log("weights changed to " + weightsFile, LogLevel.INFO)
+                self.update_ModelTable()
+                self.update_CollTable()
+        except Exception as err: 
+            self.logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING)
     
     def usrConfig_changed(self): 
-        if(self.combo_usrConfig.currentIndex() >= 0):
+        try: 
+            if(self.combo_usrConfig.currentIndex() >= 0):
 
-            configFile = self.combo_usrConfig.currentText()
-            name = configFile.strip(".py")
+                configFile = self.combo_usrConfig.currentText()
+                name = configFile.strip(".py")
 
-            if(self.imageDet.model != None and self.imageDet.model.collection != "User"): 
-                self.imageDet.collection = classes.Collection("USER")
+                if(self.imageDet.model != None and self.imageDet.model.collection != "User"): 
+                    self.imageDet.collection = classes.Collection("USER")
 
-                self.imageDet.model = classes.Model(name = name, 
-                                    collection = "User", 
-                                    metadata=None, 
-                                    config = paths.USER_CONFIGS + configFile,
-                                    weights = None)
-            else: 
-                self.imageDet.model.name = name
-                self.imageDet.model.config = paths.USER_CONFIGS+ configFile
-            self.logger.log("model changed to " + configFile, LogLevel.INFO)
-            self.update_ModelTable()
-            self.update_CollTable()
+                    self.imageDet.model = classes.Model(name = name, 
+                                        collection = "User", 
+                                        metadata=None, 
+                                        config = paths.USER_CONFIGS + configFile,
+                                        weights = None)
+                else: 
+                    self.imageDet.model.name = name
+                    self.imageDet.model.config = paths.USER_CONFIGS+ configFile
+                self.logger.log("model changed to " + configFile, LogLevel.INFO)
+                self.update_ModelTable()
+                self.update_CollTable()
+        except Exception as err: 
+            self.logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING)
     
     def api_changed(self): 
         self.imageDet.api = self.combo_api.currentText()
@@ -402,27 +402,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     
     def changeTo_usrModelMode(self): 
-        if( not self.imageDet.usrModelMode):
-            self.imageDet.usrModelMode = True
-            self.logger.log("Swapped to User Model Mode", LogLevel.DEBUG)
-            self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+        try: 
+            if( not self.imageDet.usrModelMode):
+                self.imageDet.usrModelMode = True
+                self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                    border: 1px solid rgba(255, 255, 255, 0.12);")
+                self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
-            self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
-                                            border: 1px solid rgba(255, 255, 255, 0.12);")
-            self.combo_usrConfig.setStyleSheet("")
-            self.combo_usrWeights.setStyleSheet("")
+                self.combo_usrConfig.setStyleSheet("")
+                self.combo_usrWeights.setStyleSheet("")
+
+                self.usrConfig_changed()
+                self.usrWeights_changed()
+                self.logger.log("Swapped to User Model Mode", LogLevel.INFO)
+        except Exception as e: 
+            self.logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING)
         
     def changeTo_MMDetModelMode(self): 
-        if(self.imageDet.usrModelMode):
-            self.imageDet.usrModelMode = False
-            self.logger.log("Swapped to MMDet Model Mode", LogLevel.DEBUG)
+        try: 
+            if(self.imageDet.usrModelMode):
+                self.imageDet.usrModelMode = False
+                self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                    border: 1px solid rgba(255, 255, 255, 0.12);")
+                self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                                                    border: 1px solid rgba(255, 255, 255, 0.12);")
+                self.combo_collection.setStyleSheet("")
+                self.combo_model.setStyleSheet("")
 
-            self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
-                                                border: 1px solid rgba(255, 255, 255, 0.12);")
-            self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
-                                                border: 1px solid rgba(255, 255, 255, 0.12);")
-            self.combo_collection.setStyleSheet("")
-            self.combo_model.setStyleSheet("")
+                self.model_changed()
+                self.coll_changed()
+                self.logger.log("Swapped to MMDet Model Mode", LogLevel.INFO)
+
+        except Exception as err: 
+            self.logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING)
 
 #Webcam Detection
     def startWebcam(self): 

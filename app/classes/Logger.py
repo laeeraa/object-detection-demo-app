@@ -19,5 +19,6 @@ class Logger:
                 message = (f"[{log_level.name}] {err}")
             else: 
                 message = (f"Unexpected Error {err} of Type: {type(err)}")
+            print(message)
             self.signalEmitter.message_logged.emit(message, log_level)
 

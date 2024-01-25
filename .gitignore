@@ -1,6 +1,7 @@
 app/packages/*
 data/images/*
-data/models/*
+data/models/configs/*
+data/models/checkpoints/*
 env/*
 
 # python build output #

@@ -9,7 +9,7 @@ from PyQt5.QtCore import Qt
 
 from app.constants import paths
 
-from app.constants.types import Filetype
+from app.constants.types import Filetype, LogLevel
 
 class FileDialog(QDialog):
 
@@ -53,15 +53,16 @@ class FileDialog(QDialog):
         
         #called when open button is pushed in file dialog
         if files:
-            self.parent.logger.log("Adding files to data directory", LogLevel.INFO)
+            self.parent.logger.log("Adding files to data directory...", LogLevel.INFO)
             try: 
                 for f in files: 
                     shutil.copy2(f, copyTo)
                 self.done(1)
                 self.parent.update_FilesList()
+                self.parent.logger.log("Added files to data directory", LogLevel.INFO)
                 return 0
             except Exception as e: 
-                self.parent.logger.WARNING("Something went wrong copying the pictures into the specified directory %s\n %s", {self.copyTo, e})
+                self.parent.logger.log(f"Something went wrong copying the files into the specified directory {copyTo}\n Error: {e}", LogLevel.ERROR)
                 return -1
 
 # if __name__ == '__main__':

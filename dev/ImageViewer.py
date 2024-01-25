@@ -10,7 +10,6 @@ def scaleImg(value):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    #print("Qt Version:", QT_VERSION_STR)
 
     qGScene = QGraphicsScene()
     qGItemGrp = QGraphicsItemGroup()

@@ -3,9 +3,6 @@
 import os
 import sys
 
-scriptpath = "C:\cust\Studium_local\Studienprojekt\OpenMMLab\mmdetection"
-sys.path.append(os.path.abspath(scriptpath))
-
 from mmdet.apis import DetInferencer
 from mmdet.evaluation import get_classes
 
