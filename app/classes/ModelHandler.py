@@ -39,6 +39,8 @@ class ModelHandler:
         print("...finished initializing collections and models")
     
     def get_UserModels(self): 
+        self.usrCheckpoints.clear() 
+        self.usrCheckpoints.clear()
         print("Scanning Directory %s for and Configs & Weights ... " % (paths.USER_MODELS))
         for dir in os.scandir(paths.USER_MODELS):
             if dir.is_dir() and dir.name == "checkpoints":

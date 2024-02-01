@@ -152,7 +152,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.combo_usrConfig.addItem(c)
         self.combo_usrWeights.setCurrentIndex(0)
         self.combo_usrConfig.setCurrentIndex(0)
-        self.imageDet.usrModelMode = True
 
     def init_ImageViewer(self): 
         self.qGScene = QGraphicsScene()
@@ -211,6 +210,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tb_modelInfo.item(3,0).setText(" ")
             self.tb_modelInfo.item(4,0).setText(" ")
 
+    def update_userModels(self): 
+        self.combo_usrConfig.clear() 
+        self.combo_usrWeights.clear()
+        for c in self.modelHandler.usrCheckpoints: 
+            self.combo_usrWeights.addItem(c)
+        for c in self.modelHandler.usrConfigs: 
+            self.combo_usrConfig.addItem(c)
+        self.combo_usrWeights.setCurrentIndex(0)
+        self.combo_usrConfig.setCurrentIndex(0)
 
     def coll_changed(self): 
         if(self.combo_collection.currentIndex() >=0):
@@ -300,13 +308,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.log("outputDir changed to " + self.imageDet.out_dir, LogLevel.DEBUG)
 
     def open_FileDialog_Image(self ): 
-        classes.FileDialog(self, Filetype.IMAGE) 
+        classes.FileDialog(self, Filetype.IMAGE)
+        self.update_FilesList() 
 
     def open_FileDialog_Weights(self): 
         classes.FileDialog(self, Filetype.WEIGHTS)
+        self.modelHandler.get_UserModels()
+        self.update_userModels()
 
     def open_FileDialog_Configs(self): 
         classes.FileDialog(self, Filetype.CONFIG)
+        self.modelHandler.get_UserModels()
+        self.update_userModels()
 
 
 #Sonstige Funktionen 
