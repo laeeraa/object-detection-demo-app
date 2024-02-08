@@ -2,6 +2,7 @@ import sys
 import textwrap
 from threading import Event
 import cv2
+import json
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow,QHeaderView, QAbstractItemView, QTableWidgetItem, QListWidgetItem ) 
 
@@ -363,8 +364,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
 
     def list_resImages_event(self): 
-        path =  paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
-        self.update_ResImg(path)
+        path_img =  paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
+        self.update_ResImg(path_img)
+        path_pred = paths.IMAGES_RES + "/preds/" +  self.list_resultDir.currentItem().text().replace(".jpg", ".json")
+        
+        # Load the JSON data from the file
+        with open(path_pred) as f:
+            data = json.load(f)
+            predTable = self.imageDet.getPredTable(data)
+            self.update_predTable(predTable)
 
     def processImage(self): 
         #Bild in Funktion reinwerfen
@@ -387,20 +395,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif(ret[1] != None): 
             self.displayImageRes()
             self.ln_ObjectCount.setText("Objects detected: " + str(len(ret[1])))
-            self.tb_predictions.clear()
-            for i, r in enumerate(ret[1]): 
-                self.tb_predictions.insertRow(self.tb_predictions.rowCount())
-                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
-                         0, QTableWidgetItem(str(r['labelno']),0))
-                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
-                         1, QTableWidgetItem("{:.2f}%".format(float(r['score'])*100),0))
-                self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
-                         2, QTableWidgetItem(r['labelclass'], 0))
-
-            self.tb_predictions.sortByColumn(0, 0)
+            self.update_predTable(ret[1])
             self.update_resultImgList()
         else: 
             self.logger.log("No objects detected", LogLevel.WARNING )
+
+    def update_predTable(self, predTable): 
+        print(self.tb_predictions.rowCount())
+        for r in range(self.tb_predictions.rowCount()): 
+            self.tb_predictions.removeRow(0)
+        print(self.tb_predictions.rowCount())
+        for i, r in enumerate(predTable): 
+            self.tb_predictions.insertRow(self.tb_predictions.rowCount())
+            self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                        0, QTableWidgetItem(str(r['labelno']),0))
+            self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                        1, QTableWidgetItem("{:.2f}%".format(float(r['score'])*100),0))
+            self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
+                        2, QTableWidgetItem(r['labelclass'], 0))
+            self.update_resultImgList()
 
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()

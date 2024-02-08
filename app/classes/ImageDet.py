@@ -42,29 +42,32 @@ class ImageDet():
     def processImage_OpenMMLab(self,image_path):
         # build the model from a config file and a checkpoint file
         inferencer = None
-        if(not self.usrModelMode): 
-            inferencer = DetInferencer(model=self.model.name, device=self.device)
-        else: 
-            inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
-        
+        #image_path = ["C:/checkout/Studium_C/Studienprojekt/ObjectDetectionEvaluationApp/data/images/3.jpg", "C:/checkout/Studium_C/Studienprojekt/ObjectDetectionEvaluationApp/data/images/5.jpg" ]
         try: 
-            resultdict = inferencer(out_dir=self.out_dir, 
-                            inputs=image_path, 
-                            pred_score_thr=self.score_thr, 
-                            batch_size=self.batch_size,
-                            no_save_pred = False)
+            if(not self.usrModelMode): 
+                inferencer = DetInferencer(model=self.model.name, device=self.device)
+            else: 
+                inferencer = DetInferencer(model=self.model.config, weights = self.model.weights, device=self.device)
         except Exception as e: 
-            return(-1, e)
+            return(-1,e)   
         else: 
-            predTable = self.getPredTable(resultdict)
-            return (1, predTable)
+            try: 
+                resultdict = inferencer(out_dir=self.out_dir, 
+                                inputs=image_path, 
+                                pred_score_thr=self.score_thr, 
+                                batch_size=self.batch_size,
+                                no_save_pred = False)
+            except Exception as e: 
+                return(-1, e)
+            else: 
+                predictions = resultdict["predictions"][0]
+                predTable = self.getPredTable(predictions)
+                return (1, predTable)
         
     
     def getPredTable(self, results): 
-        #bbox_result = results["predictions"][0]["bboxes"]
-        #print(results)
-        labels = results["predictions"][0]["labels"]
-        scores = results["predictions"][0]["scores"]
+        labels = results["labels"]
+        scores = results["scores"]
         classes = get_classes("coco")
 
         predtable = list()
@@ -79,4 +82,5 @@ class ImageDet():
                 }
                 predtable.append(pred)
             i+= 1
+        print(predtable)
         return predtable
