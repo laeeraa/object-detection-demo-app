@@ -393,18 +393,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.log(err, LogLevel.ERROR)
             return
         elif(ret[1] != None): 
+            self.logger.log(f"Predictions Results for image {path}:\n {ret[1]}", LogLevel.DEBUG)
             self.displayImageRes()
-            self.ln_ObjectCount.setText("Objects detected: " + str(len(ret[1])))
             self.update_predTable(ret[1])
             self.update_resultImgList()
         else: 
             self.logger.log("No objects detected", LogLevel.WARNING )
 
     def update_predTable(self, predTable): 
-        print(self.tb_predictions.rowCount())
+        self.ln_ObjectCount.setText("Objects detected: " + str(len(predTable)))
         for r in range(self.tb_predictions.rowCount()): 
             self.tb_predictions.removeRow(0)
-        print(self.tb_predictions.rowCount())
         for i, r in enumerate(predTable): 
             self.tb_predictions.insertRow(self.tb_predictions.rowCount())
             self.tb_predictions.setItem(self.tb_predictions.rowCount()-1, 
