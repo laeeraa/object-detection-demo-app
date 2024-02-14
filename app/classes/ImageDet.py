@@ -83,3 +83,5 @@ class ImageDet():
                 predtable.append(pred)
             i+= 1
         return predtable
+    
+

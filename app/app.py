@@ -5,8 +5,6 @@ from PyQt5.QtWidgets import QApplication
 
 import ctypes
 
-
-
 # get the current working directory and add to the system path
 current_working_directory = os.getcwd()
 

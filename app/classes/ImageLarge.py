@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
 
 import cv2
 from app.constants import paths
+from app.constants.types import LogLevel
 
 from app.scripts.helpers import convert_cv_qt
 

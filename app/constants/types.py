@@ -13,8 +13,8 @@ class LogLevel(Enum):
     CRITICAL = 4
 
 class LogColor(Enum):
-    DEBUG = "#227D9B"   # Blue
-    INFO = "#1F845A"    # Green
+    DEBUG = "#596773"   # DarkNeutral500
+    INFO = "#596773"    # DarkNeutral500
     WARNING = "#C25100"  # Orange
     ERROR = "#C9372C"    # Red
     CRITICAL = "#6E5DC6" # Purple

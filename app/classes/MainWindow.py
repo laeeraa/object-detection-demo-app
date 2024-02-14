@@ -58,12 +58,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.log("The MainWindow has been initialized", LogLevel.INFO)
 
     def connectSignalsSlots(self):
-        self.Btn_ImageDet_2.clicked.connect(self.openImageDetection)
-        self.Btn_ImageDet_2.setIcon(QIcon("./app/assets/image1.png"))
-        self.Btn_VideoDet_2.clicked.connect(self.openVideoDetection)
-        self.Btn_VideoDet_2.setIcon(QIcon("./app/assets/video1.png"))
-        self.Btn_WebcamDet_2.clicked.connect(self.openWebcamDetection)
-        self.Btn_WebcamDet_2.setIcon(QIcon("./app/assets/webcam1.png"))
+        self.Btn_ImageDet.clicked.connect(self.openImageDetection)
+        self.Btn_ImageDet.setIcon(QIcon("./app/assets/image1.png"))
+        self.Btn_VideoDet.clicked.connect(self.openVideoDetection)
+        self.Btn_VideoDet.setIcon(QIcon("./app/assets/video1.png"))
+        self.Btn_WebcamDet.clicked.connect(self.openWebcamDetection)
+        self.Btn_WebcamDet.setIcon(QIcon("./app/assets/webcam1.png"))
         self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
         self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
         self.btn_process.clicked.connect(self.processImage)
@@ -375,16 +375,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update_predTable(predTable)
 
     def processImage(self): 
-        #Bild in Funktion reinwerfen
+        path = ""
         try: 
             path = paths.IMAGES + self.list_filenames.currentItem().text()
         except Exception as err: 
             self.logger.log("Specified Imagepath could not be read", LogLevel.WARNING)
             return
-
-        #stop sorting 
-        self.tb_predictions.sortByColumn(-1, 0)
-        self.logger.log("processing Image...", LogLevel.INFO)
+        self.logger.log("Processing Image from Path: {path}", LogLevel.INFO)
 
         ret = self.imageDet.processImage(path)
         if ret[0] == -1:
@@ -472,15 +469,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def stopWebcam(self): 
         self.thread.stop()
-
-
-    @pyqtSlot(np.ndarray)
-    def update_image(self, cv_img):
-        """Updates the image_label with a new opencv image"""
-        qt_img = convert_cv_qt(cv_img)
-        self.lb_webcam.setPixmap(qt_img)
     
-
     def startHandGestureRecog(self): 
         self.stopHandGestureRecogEvent.clear()
         # create the video capture thread
@@ -493,6 +482,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def stopHandGestureRecog(self):
         self.thread.stop()
 
+    #Webcam
+    @pyqtSlot(np.ndarray)
+    def update_image(self, cv_img):
+        """Updates the image_label with a new opencv image"""
+        qt_img = convert_cv_qt(cv_img)
+        self.lb_webcam.setPixmap(qt_img)
+
+    #WebcamDetection
     @pyqtSlot(np.ndarray)
     def update_imageDet(self, cv_img):
         """Updates the image_label with a new opencv image"""
