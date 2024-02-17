@@ -1,4 +1,4 @@
-__all__=["paths", "types"]
+__all__ = ["paths", "types"]
 
 from .paths import *
 from .types import *

@@ -3,9 +3,13 @@
         "./UI/QT"
     ],
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter", 
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
     },
-    "python.formatting.provider": "none",
+    "isort.args": ["--profile", "black"],
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic"
 }

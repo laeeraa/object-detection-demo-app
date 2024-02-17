@@ -1,9 +1,12 @@
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from app.constants.types import DetType, LogLevel
-from PyQt5.QtCore import pyqtSignal, QObject
+
 
 class LoggerEmitter(QObject):
     # Define a custom signal with a value
-    message_logged = pyqtSignal(str, LogLevel, object )
+    message_logged = pyqtSignal(str, LogLevel, object)
+
 
 class Logger:
     def __init__(self, level=LogLevel.DEBUG):
@@ -37,5 +40,6 @@ class Logger:
         if log_level.value >= self.level.value:
             self.signalEmitter.message_logged.emit(message, log_level, det_type)
         print(message)
+
 
 logger = Logger(level=LogLevel.INFO)

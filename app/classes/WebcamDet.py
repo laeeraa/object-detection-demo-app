@@ -1,11 +1,11 @@
-from app.classes.VideoThread_OpenMMLab import VideoDetThread_OpenMMLab
-from app.classes.ObjectDet import ObjectDet
-
-from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 from threading import Event
 
+from app.classes.ObjectDet import ObjectDet
+from app.classes.VideoThread_OpenMMLab import VideoDetThread_OpenMMLab
+from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 
-class WebcamDet(ObjectDet): 
+
+class WebcamDet(ObjectDet):
 
     def __init__(self):
         super().__init__()
@@ -13,15 +13,13 @@ class WebcamDet(ObjectDet):
         self.api = "TechVidvan"
         self.stop_WebcamDetEvent = Event()
 
-    
-    def run(self, parent): 
-        if (self.api == "TechVidvan"): 
+    def run(self, parent):
+        if self.api == "TechVidvan":
             self.start_HandGestureRecog(parent)
-        elif(self.api == "OpenMMLab"): 
+        elif self.api == "OpenMMLab":
             self.start_OpenMMLabDet(parent)
-    
-    
-    def start_HandGestureRecog(self, parent): 
+
+    def start_HandGestureRecog(self, parent):
         self.stop_WebcamDetEvent.clear()
         # create the video capture thread
         self.thread = VideoDetThread(self.stop_WebcamDetEvent)
@@ -30,8 +28,8 @@ class WebcamDet(ObjectDet):
         # start the thread
         self.thread.start()
 
-    def start_OpenMMLabDet(self, parent): 
-        self.stop_WebcamDetEvent.clear() 
+    def start_OpenMMLabDet(self, parent):
+        self.stop_WebcamDetEvent.clear()
         self.thread = VideoDetThread_OpenMMLab(self, self.stop_WebcamDetEvent)
         self.thread.change_pixmap_signal.connect(parent.update_imageDet)
         self.thread.start()
