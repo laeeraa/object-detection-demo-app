@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 
 class Filetype(Enum):
     CONFIG = 1
@@ -18,3 +18,8 @@ class LogColor(Enum):
     WARNING = "#C25100"  # Orange
     ERROR = "#C9372C"    # Red
     CRITICAL = "#6E5DC6" # Purple
+
+class DetType(Enum): 
+    IMAGEDET = "Image Detection"
+    WEBCAMDET = "Webcam Detection"
+    VIDEODET = "Video Detection"

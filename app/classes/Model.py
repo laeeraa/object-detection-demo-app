@@ -28,19 +28,19 @@ class Result:
 
 
 class Model:
-    def __init__(self, name, collection, config, metadata, weights):
+    def __init__(self, name, collection, config, metadata, checkpoint):
         self.name = name
         self.collection = collection
         self.config = config
         if(metadata != None): self.metadata = Metadata(metadata.get("Training Memory GB"), metadata.get("Epochs"), metadata.get("inference time (ms/im)")) 
         else: self.metadata = Metadata()
         self.results = []
-        self.weights = weights
+        self.checkpoint = checkpoint
 
     def add_results(self, result):
         self.results.append(result)
 
     def __str__(self):
         results_str = "\n".join([f"- {result}" for result in self.results])
-        return f"Name: {self.name}\nIn Collection: {self.collection}\nConfig: {self.config}\nMetadata: {self.metadata}\nResults: {results_str}\nWeights: {self.weights}"
+        return f"Name: {self.name}\nIn Collection: {self.collection}\nConfig: {self.config}\nMetadata: {self.metadata}\nResults: {results_str}\nWeights: {self.checkpoint}"
 

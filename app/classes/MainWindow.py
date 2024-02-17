@@ -1,6 +1,3 @@
-import sys
-import textwrap
-from threading import Event
 import cv2
 import json
 
@@ -12,7 +9,7 @@ from PyQt5.QtCore import(
 
 from PyQt5.QtGui import *
 import numpy as np
-from app.constants.types import Filetype, LogLevel
+from app.constants.types import Filetype, LogLevel, DetType
 from app.packages.Hand_Gesture_Recognizer.hand_gesture_detection import VideoDetThread
 from app.scripts.helpers import convert_cv_qt
 
@@ -27,23 +24,30 @@ from app.constants.types import LogLevel, LogColor
 from PyQt5.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsItemGroup, QWidget, QVBoxLayout, QSlider, QGraphicsPixmapItem
 from PyQt5.QtGui import QImage, QPixmap, QTransform
 from PyQt5.QtCore import Qt, QObject
+from app.classes.CustomLogger import logger
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
 
         self.imageDet = classes.ImageDet()
+        self.webcamDet = classes.WebcamDet()
+        self.videoDet = classes.VideoDet()
         self.modelHandler = classes.ModelHandler()
-        self.stopHandGestureRecogEvent = Event()
 
         super().__init__(parent)
 
         self.setupUi(self)
-        self.connectSignalsSlots()
 
-        #setup logger
-        self.logger = classes.Logger(level=LogLevel.INFO)
-        self.logger.signalEmitter.message_logged.connect(self.update_log_window)
+        #connect signals of frontend events to the handler Functions
+        self.connectSignalsSlots_Start()
+        self.connectSignalsSlots_ImageDet()
+        self.connectSignalsSlots_WebcamDet()
+        self.connectSignalsSlots_Results()
+        self.connectSignalsSlots_VideoDet()
+
+        logger.signalEmitter.message_logged.connect(self.update_log_window)
 
         self.init_modelOptions()
         self.init_CollTable()
@@ -55,25 +59,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_FilesList()
         self.update_resultImgList()
-        self.logger.log("The MainWindow has been initialized", LogLevel.INFO)
+        logger.log("The MainWindow has been initialized", LogLevel.INFO)
 
-    def connectSignalsSlots(self):
+    def connectSignalsSlots_Start(self): 
         self.Btn_ImageDet.clicked.connect(self.openImageDetection)
         self.Btn_ImageDet.setIcon(QIcon("./app/assets/image1.png"))
         self.Btn_VideoDet.clicked.connect(self.openVideoDetection)
         self.Btn_VideoDet.setIcon(QIcon("./app/assets/video1.png"))
         self.Btn_WebcamDet.clicked.connect(self.openWebcamDetection)
         self.Btn_WebcamDet.setIcon(QIcon("./app/assets/webcam1.png"))
-        self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
-        self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
-        self.btn_process.clicked.connect(self.processImage)
-        self.btn_openImageDialog.clicked.connect(self.openImageDialog)
 
-        self.btn_addImage.clicked.connect(self.open_FileDialog_Image)
-        self.btn_startWebcam.clicked.connect(self.startWebcam)
-        self.btn_startWebcamDet.clicked.connect(self.startHandGestureRecog)
-        self.btn_stopWebcamDet.clicked.connect(lambda x: self.stopHandGestureRecogEvent.set())
-        self.combo_chooseDevice.currentIndexChanged.connect(self.device_changed)
+    def connectSignalsSlots_ImageDet(self):   
+        self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
+        self.btn_process.clicked.connect(self.processImage)
         self.ln_batchSize.editingFinished.connect(self.batchSize_changed)
         self.ln_outputDir.editingFinished.connect(self.outputDir_changed)
         self.ln_threshhold.editingFinished.connect(self.threshhold_changed)
@@ -81,16 +79,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
         # Comboboxes
-        self.combo_api.currentIndexChanged.connect(self.api_changed)
-        self.combo_model.currentIndexChanged.connect(self.model_changed)
-        self.combo_collection.currentIndexChanged.connect(self.coll_changed)
-        self.combo_usrConfig.currentIndexChanged.connect(self.usrConfig_changed)
-        self.combo_usrWeights.currentIndexChanged.connect(self.usrWeights_changed)
-
-        self.combo_model.activated.connect(self.changeTo_MMDetModelMode)
-        self.combo_collection.activated.connect(self.changeTo_MMDetModelMode)
-        self.combo_usrConfig.activated.connect(self.changeTo_usrModelMode)
-        self.combo_usrWeights.activated.connect(self.changeTo_usrModelMode)
+        self.combo_chooseDevice.currentIndexChanged.connect(lambda i: self.device_changed(DetType.IMAGEDET))
+        self.combo_api.currentIndexChanged.connect(lambda i: self.api_changed(DetType.IMAGEDET))
+        self.combo_model.currentIndexChanged.connect(lambda i:self.model_changed(DetType.IMAGEDET))
+        self.combo_collection.currentIndexChanged.connect(lambda i:self.coll_changed(DetType.IMAGEDET))
+        self.combo_usrConfig.currentIndexChanged.connect(lambda i:self.usrConfig_changed(DetType.IMAGEDET))
+        self.combo_usrWeights.currentIndexChanged.connect(lambda i:self.usrWeights_changed(DetType.IMAGEDET))
+        self.combo_model.activated.connect(lambda i:self.changeTo_MMDetModelMode(DetType.IMAGEDET))
+        self.combo_collection.activated.connect(lambda i:self.changeTo_MMDetModelMode(DetType.IMAGEDET))
+        self.combo_usrConfig.activated.connect(lambda i:self.changeTo_usrModelMode(DetType.IMAGEDET))
+        self.combo_usrWeights.activated.connect(lambda i:self.changeTo_usrModelMode(DetType.IMAGEDET))
 
         # change SizeAdjustPolicy to none instead of AdjustToContentsOnFirstShow
         # so that it doesn't adjust once the stylesheet is changed
@@ -99,44 +97,82 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_usrConfig.setSizeAdjustPolicy(5)
         self.combo_usrWeights.setSizeAdjustPolicy(5)
     
+    def connectSignalsSlots_WebcamDet(self): 
+        self.btn_startWebcamDet_2.clicked.connect(self.start_WebcamDet)
+        self.btn_stopWebcamDet_2.clicked.connect(lambda x: self.webcamDet.stop_WebcamDetEvent.set())
+        self.combo_chooseDevice_2.currentIndexChanged.connect(lambda i: self.device_changed(DetType.WEBCAMDET))
+        self.ln_threshhold_2.editingFinished.connect(lambda i: self.threshhold_changed(DetType.WEBCAMDET))
+        self.btn_uploadConfig_2.clicked.connect(self.open_FileDialog_Configs)
+        self.btn_uploadWeights_2.clicked.connect(self.open_FileDialog_Weights)
+        self.combo_api_2.currentIndexChanged.connect(lambda i: self.api_changed(DetType.WEBCAMDET))
+        self.combo_model_2.currentIndexChanged.connect(lambda I: self.model_changed(DetType.WEBCAMDET))
+        self.combo_usrConfig_2.currentIndexChanged.connect(lambda I: self.usrConfig_changed(DetType.WEBCAMDET))
+        self.combo_usrWeights_2.currentIndexChanged.connect(lambda i: self.usrWeights_changed(DetType.WEBCAMDET))
+        self.combo_collection_2.currentIndexChanged.connect(lambda i: self.coll_changed(DetType.WEBCAMDET))
+
+        self.combo_model_2.activated.connect(lambda i:self.changeTo_MMDetModelMode(DetType.WEBCAMDET))
+        self.combo_collection_2.activated.connect(lambda i:self.changeTo_MMDetModelMode(DetType.WEBCAMDET))
+        self.combo_usrConfig_2.activated.connect(lambda i:self.changeTo_usrModelMode(DetType.WEBCAMDET))
+        self.combo_usrWeights_2.activated.connect(lambda i:self.changeTo_usrModelMode(DetType.WEBCAMDET))
+    
+    def connectSignalsSlots_VideoDet(self): 
+        self.combo_chooseDevice_3.currentIndexChanged.connect(lambda i: self.device_changed(DetType.VIDEODET))
+        pass
+
+    def connectSignalsSlots_Results(self): 
+        self.btn_openImageDialog.clicked.connect(self.openImageDialog)
+        self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
+
+
+#Init functions
     #check which models exist in filepath and add those to dropdown 
     def init_modelOptions(self):
-        #init Collections Combo Box
-        self.combo_collection.clear()
-        for c in self.modelHandler.collections: 
-            self.combo_collection.addItem(c.name)
-        self.combo_collection.setCurrentIndex(-1)
-       
-        #init Model ComboBox
-        self.combo_model.clear()
         
-        for c in self.modelHandler.collections:
-            for m in c.models: 
-                self.combo_model.addItem(m.name)
+        collectionCombos = [self.combo_collection, self.combo_collection_2, self.combo_collection_3]
+
+        for combo in collectionCombos: 
+            combo.clear()
+
+            for c in self.modelHandler.collections: 
+                combo.addItem(c.name)
+            combo.setCurrentIndex(-1)
+        
+
+        modelCombos = [self.combo_model, self.combo_model_2, self.combo_model_3]
+        
+        #init Model ComboBox
+        for combo in modelCombos:
+            combo.clear()
+            
+            for c in self.modelHandler.collections:
+                for m in c.models: 
+                    combo.addItem(m.name)
         
 
 #Init functions
     def init_CollTable(self): 
-        header = self.tb_collInfo.horizontalHeader()
-        #header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        headerV = self.tb_collInfo.verticalHeader()
-        headerV.setDefaultSectionSize(37)
-        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tb_collInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        
+        collectionTables = [self.tb_collInfo, self.tb_collInfo_2, self.tb_collInfo_3]
+        for table in collectionTables: 
+            headerV = table.verticalHeader()
+            headerV.setDefaultSectionSize(37)
+            headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+            table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def init_ModelTable(self): 
-        header = self.tb_modelInfo.horizontalHeader()
-        #header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        headerV = self.tb_modelInfo.verticalHeader()
-        headerV.setDefaultSectionSize(37)
-        headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tb_modelInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        modeltables = [self.tb_modelInfo, self.tb_modelInfo_2, self.tb_modelInfo_3]
+        
+        for table in modeltables: 
+            headerV = table.verticalHeader()
+            headerV.setDefaultSectionSize(37)
+            headerV.setSectionResizeMode(QHeaderView.ResizeToContents)
+            table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def init_DeviceOptions(self): 
-        self.combo_chooseDevice.clear() 
-        for g in self.modelHandler.devices: 
-            self.combo_chooseDevice.addItem(g.name)
+        deviceCombos = [self.combo_chooseDevice, self.combo_chooseDevice_2, self.combo_chooseDevice_3]
+        for combo in deviceCombos: 
+            combo.clear() 
+            for g in self.modelHandler.devices: 
+                combo.addItem(g.name)
             
     def init_Params(self): 
         self.imageDet.batch_size = 1 
@@ -147,13 +183,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ln_outputDir.setText(str(self.imageDet.out_dir))
     
     def init_userModels(self): 
-        for c in self.modelHandler.usrCheckpoints: 
-            self.combo_usrWeights.addItem(c)
-        for c in self.modelHandler.usrConfigs: 
-            self.combo_usrConfig.addItem(c)
-        self.combo_usrWeights.setCurrentIndex(0)
-        self.combo_usrConfig.setCurrentIndex(0)
 
+        usrWeightsCombos = [self.combo_usrWeights, self.combo_usrWeights_2, self.combo_usrWeights_3]
+        usrConfigsCombos = [self.combo_usrConfig, self.combo_usrConfig_2, self.combo_usrConfig_3]
+
+        for combo in usrWeightsCombos: 
+            for c in self.modelHandler.usrCheckpoints: 
+                combo.addItem(c)
+            combo.setCurrentIndex(0)
+
+        for combo in usrConfigsCombos:
+            for c in self.modelHandler.usrConfigs: 
+                combo.addItem(c)
+            combo.setCurrentIndex(0)
+
+    #init ImageViewer on Result Page
     def init_ImageViewer(self): 
         self.qGScene = QGraphicsScene()
         self.qGItemGrp = QGraphicsItemGroup()
@@ -165,7 +209,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         qSlider.setRange(-100, 100)
         self.box_imageRes.addWidget(qSlider)
         qSlider.valueChanged.connect(self.scaleImg)
-    
+
+    # update ResultImage on Result Page 
     def update_ResImg(self, image_path): 
         self.qGScene.clear()
         self.qGItemGrp = QGraphicsItemGroup()
@@ -191,10 +236,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tb_collInfo.item(6,0).setText(self.imageDet.collection.readme)
         self.tb_collInfo.item(7,0).setText(str(self.imageDet.collection.code))
 
-    def update_log_window(self, message, log_level): 
-        item = QListWidgetItem(message, self.list_status)
-        item.setBackground(QColor(LogColor[log_level.name].value))
-        self.list_status.scrollToBottom()
+    def update_log_window(self, message, log_level, det_type = None):
+        if det_type == DetType.IMAGEDET or det_type == None:  
+            item = QListWidgetItem(message, self.list_status)
+            item.setBackground(QColor(LogColor[log_level.name].value))
+            self.list_status.scrollToBottom()
+        if det_type == DetType.WEBCAMDET or det_type == None: 
+            item = QListWidgetItem(message, self.list_status_2)
+            item.setBackground(QColor(LogColor[log_level.name].value))
+            self.list_status.scrollToBottom()
+        if det_type == DetType.VIDEODET or det_type == None: 
+            item = QListWidgetItem(message, self.list_status_3)
+            item.setBackground(QColor(LogColor[log_level.name].value))
+            self.list_status.scrollToBottom()
 
     def update_ModelTable(self): 
         if(self.imageDet.model != None): 
@@ -203,7 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.tb_modelInfo.item(2,0).setText(str(self.imageDet.model.metadata))
             results_string = "\n".join([f"- {result}" for result in self.imageDet.model.results])
             self.tb_modelInfo.item(3,0).setText(results_string)
-            self.tb_modelInfo.item(4,0).setText(self.imageDet.model.weights)
+            self.tb_modelInfo.item(4,0).setText(self.imageDet.model.checkpoint)
         else: 
             self.tb_modelInfo.item(0,0).setText(" ")
             self.tb_modelInfo.item(1,0).setText(" ")
@@ -221,16 +275,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_usrWeights.setCurrentIndex(0)
         self.combo_usrConfig.setCurrentIndex(0)
 
-    def coll_changed(self): 
-        if(self.combo_collection.currentIndex() >=0):
-            self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
-            self.update_CollTable()
-            self.update_models()
-    
-    def device_changed(self): 
-        self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
-        self.logger.log("Device changed to: " + self.imageDet.device, LogLevel.INFO)
-    
+    def coll_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            if(self.combo_collection.currentIndex() >=0):
+                self.imageDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
+                logger.log(f"Collection changed to: " + self.imageDet.device, LogLevel.INFO, det_type)
+        elif det_type == DetType.WEBCAMDET: 
+            if(self.combo_collection.currentIndex() >=0):
+                self.webcamDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
+                logger.log(f"Collection changed to: " + self.webcamDet.device, LogLevel.INFO,det_type)
+        elif det_type == DetType.VIDEODET: 
+            if(self.combo_collection.currentIndex() >=0):
+                self.videoDet.collection = self.modelHandler.find_collection(self.combo_collection.currentText())
+                logger.log(f"Collection changed to: " + self.videoDet.device, LogLevel.INFO,det_type)
+        self.update_CollTable()
+        self.update_models()
+
+    def device_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            self.imageDet.device = self.modelHandler.devices[self.combo_chooseDevice.currentIndex()].inference_string
+            logger.log(f"Device changed to: " + self.imageDet.device, LogLevel.INFO,det_type)
+        elif det_type == DetType.WEBCAMDET: 
+            self.webcamDet.device = self.modelHandler.devices[self.combo_chooseDevice_2.currentIndex()].inference_string
+            logger.log(f"Device changed to: " + self.webcamDet.device, LogLevel.INFO,det_type)
+        elif det_type == DetType.VIDEODET: 
+            self.videoDet.device = self.modelHandler.devices[self.combo_chooseDevice_3.currentIndex()].inference_string
+            logger.log(f"Device changed to: " + self.videoDet.device, LogLevel.INFO,det_type)
+
     def update_models(self): 
         #init Model ComboBox
         self.combo_model.clear()
@@ -238,75 +309,134 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for m in self.imageDet.collection.models:
             self.combo_model.addItem(m.name)
 
-    def model_changed(self): 
-        if(self.combo_model.currentIndex() >= 0):
-            self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
-            self.imageDet.collection = self.modelHandler.find_collection(self.imageDet.model.collection)
-            self.logger.log("model changed to " + self.combo_model.currentText(), LogLevel.INFO)
-            self.update_ModelTable()
-            self.update_CollTable()
+    def model_changed(self, det_type):
+        if det_type == DetType.IMAGEDET: 
+            if(self.combo_model.currentIndex() >= 0):
+                self.imageDet.model = self.modelHandler.find_model(self.combo_model.currentText())
+                self.imageDet.collection = self.modelHandler.find_collection(self.imageDet.model.collection)
+                logger.log("model changed to " + self.combo_model.currentText(), LogLevel.INFO, det_type)
+                self.update_ModelTable()
+                self.update_CollTable()
+        elif det_type == DetType.WEBCAMDET: 
+            if(self.combo_model_2.currentIndex() >= 0):
+                self.webcamDet.model = self.modelHandler.find_model(self.combo_model_2.currentText())
+                self.webcamDet.collection = self.modelHandler.find_collection(self.webcamDet.model.collection)
+                logger.log("model changed to " + self.combo_model_2.currentText(), LogLevel.INFO, det_type)
+                self.update_ModelTable()
+                self.update_CollTable()
+        elif det_type == DetType.VIDEODET: 
+            if(self.combo_model_3.currentIndex() >= 0):
+                self.videoDet.model = self.modelHandler.find_model(self.combo_model_3.currentText())
+                self.videoDet.collection = self.modelHandler.find_collection(self.videoDet.model.collection)
+                logger.log(f"model changed to {self.combo_model_3.currentText()}", LogLevel.INFO, det_type)
+                self.update_ModelTable()
+                self.update_CollTable()
+       
     
-    def usrWeights_changed(self): 
-        try: 
-            if(self.combo_usrWeights.currentIndex() >= 0):
-                
-                weightsFile = self.combo_usrWeights.currentText()
+    def usrWeights_changed(self, det_type): 
 
-                if(self.imageDet.model.collection != "User"): 
-                    self.imageDet.collection = classes.Collection("USER")
-                    self.imageDet.model = classes.Model(
+        combos =  [self.combo_usrWeights, self.combo_usrWeights_2, self.combo_usrWeights_3]
+        combo = combos[self.detTypeToNumber(det_type)]
+
+        detObject = self.detTypeToDetObject(det_type)
+        try: 
+            if(combo.currentIndex() >= 0 and detObject is not None):
+                
+                weightsFile = combo.currentText()
+
+                if(detObject.model.collection != "User"): 
+                    detObject.collection = classes.Collection("USER")
+                    detObject.model = classes.Model(
                                             name = "", 
                                             collection = "User", 
                                             metadata=None, 
                                             config = None,
-                                            weights = paths.USER_WEIGHTS + weightsFile)
+                                            checkpoint = paths.USER_WEIGHTS + weightsFile)
                 else:
-                    self.imageDet.model.weights = paths.USER_WEIGHTS + weightsFile
-                self.logger.log("weights changed to " + weightsFile, LogLevel.INFO)
+                    detObject.model.checkpoint = paths.USER_WEIGHTS + weightsFile
+                logger.log(f"weights changed to {weightsFile}", LogLevel.INFO, det_type)
                 self.update_ModelTable()
                 self.update_CollTable()
         except Exception as err: 
-            self.logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING)
-    
-    def usrConfig_changed(self): 
-        try: 
-            if(self.combo_usrConfig.currentIndex() >= 0):
+            logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING, det_type)
 
-                configFile = self.combo_usrConfig.currentText()
+    def detTypeToDetObject(self, det_type): 
+        if det_type == DetType.IMAGEDET:
+            return self.imageDet
+        elif det_type == DetType.WEBCAMDET: 
+            return self.webcamDet
+        elif det_type == DetType.VIDEODET: 
+            return self.videoDet
+        
+    def detTypeToNumber(self, det_type):
+        if det_type == DetType.IMAGEDET:
+            return 0
+        elif det_type == DetType.WEBCAMDET: 
+            return 1
+        elif det_type == DetType.VIDEODET: 
+            return 2
+        return -1
+
+    def usrConfig_changed(self, det_type):
+        combos =  [self.combo_usrConfig, self.combo_usrConfig_2, self.combo_usrConfig_3]
+        combo = combos[self.detTypeToNumber(det_type)]
+
+        detObject = self.detTypeToDetObject(det_type)
+
+        try: 
+            if(combo.currentIndex() >= 0 and detObject != None):
+
+                configFile = combo.currentText()
                 name = configFile.strip(".py")
 
-                if(self.imageDet.model != None and self.imageDet.model.collection != "User"): 
-                    self.imageDet.collection = classes.Collection("USER")
+                if(detObject.model != None and detObject.model.collection != "User"): 
+                    detObject.collection = classes.Collection("USER")
 
-                    self.imageDet.model = classes.Model(name = name, 
+                    detObject.model = classes.Model(name = name, 
                                         collection = "User", 
                                         metadata=None, 
                                         config = paths.USER_CONFIGS + configFile,
-                                        weights = None)
+                                        checkpoint = None)
                 else: 
-                    self.imageDet.model.name = name
-                    self.imageDet.model.config = paths.USER_CONFIGS+ configFile
-                self.logger.log("model changed to " + configFile, LogLevel.INFO)
+                    detObject.model.name = name
+                    detObject.model.config = paths.USER_CONFIGS + configFile
+                logger.log(f"model changed to {configFile}", LogLevel.INFO, det_type)
                 self.update_ModelTable()
                 self.update_CollTable()
         except Exception as err: 
-            self.logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING)
+            logger.log(f"Something went wrong updating the User Config\n: {err}", LogLevel.WARNING, det_type)
     
-    def api_changed(self): 
-        self.imageDet.api = self.combo_api.currentText()
-        self.logger.log("API changed to " + self.combo_api.currentText(), LogLevel.INFO)
-
-    def batchSize_changed(self): 
-        self.imageDet.batch_size = float(self.ln_batchSize.text())
-        self.logger.log("Batchsize changed to " + str(self.imageDet.batch_size), LogLevel.DEBUG)
+    def api_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            self.imageDet.api = self.combo_api.currentText()
+        elif det_type == DetType.WEBCAMDET: 
+            self.webcamDet.api = self.combo_api_2.currentText()
+        elif det_type == DetType.VIDEODET: 
+            self.videoDet.api = self.combo_api_3.currentText()
+        logger.log(f"API changed to {self.combo_api.currentText()}", LogLevel.DEBUG, det_type)
     
-    def threshhold_changed(self): 
-        self.imageDet.score_thr = float(self.ln_threshhold.text())
-        self.logger.log("Thresshold changed to "+ str(self.imageDet.score_thr), LogLevel.DEBUG)
+    def batchSize_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            self.imageDet.batch_size = int(self.ln_batchSize.text())
+        elif det_type == DetType.VIDEODET: 
+            self.videoDet.batch_size = int(self.ln_batchSize_3.text())
+        logger.log(f"Batchsize changed to {str(self.imageDet.batch_size)}", LogLevel.DEBUG, det_type)
     
-    def outputDir_changed(self): 
-        self.imageDet.out_dir = self.ln_outputDir.text()
-        self.logger.log("outputDir changed to " + self.imageDet.out_dir, LogLevel.DEBUG)
+    def threshhold_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            self.imageDet.score_thr = float(self.ln_threshhold.text())
+        elif det_type == DetType.WEBCAMDET: 
+            self.webcamDet.score_thr = float(self.ln_threshhold_2.text())
+        elif det_type == DetType.VIDEODET: 
+            self.videoDet.score_thr = float(self.ln_threshhold_3.text())
+        logger.log(f"Thresshold changed to {str(self.imageDet.score_thr)}" , LogLevel.DEBUG, det_type)
+    
+    def outputDir_changed(self, det_type): 
+        if det_type == DetType.IMAGEDET: 
+            self.imageDet.out_dir = self.ln_outputDir.text()
+        elif det_type == DetType.VIDEODET: 
+            self.videoDet.out_dir = self. ln_outputDir_3.text()
+        logger.log(f"outputDir changed to {self.imageDet.out_dir}", LogLevel.DEBUG, det_type)
 
     def open_FileDialog_Image(self ): 
         classes.FileDialog(self, Filetype.IMAGE)
@@ -379,23 +509,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try: 
             path = paths.IMAGES + self.list_filenames.currentItem().text()
         except Exception as err: 
-            self.logger.log("Specified Imagepath could not be read", LogLevel.WARNING)
+            logger.log("Specified Imagepath could not be read", LogLevel.WARNING)
             return
-        self.logger.log("Processing Image from Path: {path}", LogLevel.INFO)
+        logger.log("Processing Image from Path: {path}", LogLevel.INFO)
 
-        ret = self.imageDet.processImage(path)
+        ret = self.imageDet.process(path)
         if ret[0] == -1:
             #an error occured 
             err = ret[1]
-            self.logger.log(err, LogLevel.ERROR)
+            logger.log(err, LogLevel.ERROR)
             return
         elif(ret[1] != None): 
-            self.logger.log(f"Predictions Results for image {path}:\n {ret[1]}", LogLevel.DEBUG)
+            logger.log(f"Predictions Results for image {path}:\n {ret[1]}", LogLevel.DEBUG)
             self.displayImageRes()
             self.update_predTable(ret[1])
             self.update_resultImgList()
         else: 
-            self.logger.log("No objects detected", LogLevel.WARNING )
+            logger.log("No objects detected", LogLevel.WARNING )
 
     def update_predTable(self, predTable): 
         self.ln_ObjectCount.setText("Objects detected: " + str(len(predTable)))
@@ -413,7 +543,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def displayImageRes(self): 
         path =  self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
-        self.logger.log("displaying result image at " + path, LogLevel.DEBUG)
+        logger.log("displaying result image at " + path, LogLevel.DEBUG)
         self.update_ResImg(path)
         self.tabWidget.setCurrentIndex(2)
 
@@ -423,64 +553,67 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Imagedialog.exec()
 
     
-    def changeTo_usrModelMode(self): 
+    def changeTo_usrModelMode(self, det_type): 
+        combosConfig = [self.combo_usrConfig, self.combo_usrConfig_2, self.combo_usrConfig_3]
+        combosCheckpoint = [self.combo_usrWeights, self.combo_usrWeights_2, self.combo_usrWeights_3]
+        combosCollection = [self.combo_collection, self.combo_collection_2, self.combo_collection_3]
+        combosModel = [self.combo_model, self.combo_model_2, self.combo_model_3]
+        n = self.detTypeToNumber(det_type)
+        combo_config = combosConfig[n]
+        combo_checkpoint = combosCheckpoint[n]
+        combo_collection = combosCollection[n]
+        combo_model = combosModel[n]
+        detObject = self.detTypeToDetObject(det_type)
         try: 
-            if( not self.imageDet.usrModelMode):
-                self.imageDet.usrModelMode = True
-                self.combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+            if( detObject is not None and not self.imageDet.usrModelMode):
+                detObject.usrModelMode = True
+                combo_collection.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                     border: 1px solid rgba(255, 255, 255, 0.12);")
-                self.combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                combo_model.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                 border: 1px solid rgba(255, 255, 255, 0.12);")
-                self.combo_usrConfig.setStyleSheet("")
-                self.combo_usrWeights.setStyleSheet("")
+                combo_config.setStyleSheet("")
+                combo_checkpoint.setStyleSheet("")
 
-                self.usrConfig_changed()
-                self.usrWeights_changed()
-                self.logger.log("Swapped to User Model Mode", LogLevel.INFO)
+                self.usrConfig_changed(det_type)
+                self.usrWeights_changed(det_type)
+                logger.log("Swapped to User Model Mode", LogLevel.INFO)
         except Exception as e: 
-            self.logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING)
+            logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING, det_type)
         
-    def changeTo_MMDetModelMode(self): 
+    def changeTo_MMDetModelMode(self, det_type): 
+        combosConfig = [self.combo_usrConfig, self.combo_usrConfig_2, self.combo_usrConfig_3]
+        combosCheckpoint = [self.combo_usrWeights, self.combo_usrWeights_2, self.combo_usrWeights_3]
+        combosCollection = [self.combo_collection, self.combo_collection_2, self.combo_collection_3]
+        combosModel = [self.combo_model, self.combo_model_2, self.combo_model_3]
+        n = self.detTypeToNumber(det_type)
+        combo_config = combosConfig[n]
+        combo_checkpoint = combosCheckpoint[n]
+        combo_collection = combosCollection[n]
+        combo_model = combosModel[n]
+        detObject = self.detTypeToDetObject(det_type)
         try: 
-            if(self.imageDet.usrModelMode):
-                self.imageDet.usrModelMode = False
-                self.combo_usrConfig.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+            if(detObject is not None and detObject.usrModelMode):
+                detObject.usrModelMode = False
+                combo_config.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                     border: 1px solid rgba(255, 255, 255, 0.12);")
-                self.combo_usrWeights.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
+                combo_checkpoint.setStyleSheet("color: rgba(255, 255, 255, 0.3); \
                                                     border: 1px solid rgba(255, 255, 255, 0.12);")
-                self.combo_collection.setStyleSheet("")
-                self.combo_model.setStyleSheet("")
+                combo_collection.setStyleSheet("")
+                combo_model.setStyleSheet("")
 
-                self.model_changed()
-                self.coll_changed()
-                self.logger.log("Swapped to MMDet Model Mode", LogLevel.INFO)
+                self.model_changed(det_type)
+                self.coll_changed(det_type)
+                logger.log(f"Swapped to MMDet Model Mode for {det_type}", LogLevel.INFO, det_type)
 
         except Exception as err: 
-            self.logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING)
+            logger.log("Something went wrong while swapping to UserModelMode:\n{err}", LogLevel.WARNING, det_type)
 
 #Webcam Detection
-    def startWebcam(self): 
-        # create the video capture thread
-        self.thread = classes.VideoThread()
-        # connect its signal to the update_image slot
-        self.thread.change_pixmap_signal.connect(self.update_image)
-        # start the thread
-        self.thread.start()
-
-    def stopWebcam(self): 
-        self.thread.stop()
-    
-    def startHandGestureRecog(self): 
-        self.stopHandGestureRecogEvent.clear()
-        # create the video capture thread
-        self.thread = VideoDetThread(self.stopHandGestureRecogEvent)
-        # connect its signal to the update_image slot
-        self.thread.change_pixmap_signal.connect(self.update_imageDet)
-        # start the thread
-        self.thread.start()
-    
-    def stopHandGestureRecog(self):
-        self.thread.stop()
+    def start_WebcamDet(self): 
+        try: 
+            self.webcamDet.run(self)
+        except Exception as err: 
+            logger.log("{err}", LogLevel.ERROR, det_type)
 
     #Webcam
     @pyqtSlot(np.ndarray)
@@ -494,4 +627,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_imageDet(self, cv_img):
         """Updates the image_label with a new opencv image"""
         qt_img = convert_cv_qt(cv_img)
-        self.lb_webcamDet.setPixmap(qt_img)
+        self.lb_webcamDet_2.setPixmap(qt_img)

@@ -4,7 +4,7 @@ from mmdet.apis import DetInferencer
 from app.classes.ObjectDet import ObjectDet
 
 
-class ImageDet(ObjectDet):
+class VideoDet(ObjectDet):
     def __init__(self):
         super().__init__() 
 
@@ -15,7 +15,7 @@ class ImageDet(ObjectDet):
         else:
             return (-1, "Wrong API")
     
-    def processImage_OpenMMLab(self,image_path):
+    def processVideo_OpenMMLab(self,image_path):
         # build the model from a config file and a checkpoint file
         inferencer = None
         try: 

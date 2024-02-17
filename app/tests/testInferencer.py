@@ -17,7 +17,7 @@ model= Model(name ="YOLOV3",
                     collection = "User",                     
                     metadata=None       ,              
                     config = paths.USER_CONFIGS+"rtmdet_tiny_8xb32-300e_coco.py",                 
-                    weights = paths.USER_WEIGHTS + "rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth" )
+                    checkpoint = paths.USER_WEIGHTS + "rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth" )
 device="cpu"
 palette="coco"
 score_thr=float(0.3)
