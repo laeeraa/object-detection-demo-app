@@ -397,7 +397,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def camera_changed(self):
         self.webcamDet.camera_id = int(self.combo_chooseCamera.currentText())
         logger.log(
-                f"Camera Id chosen: " + self.webcamDet.camera_id, LogLevel.INFO, DetType.WEBCAMDET
+                f"Camera Id chosen: " + str(self.webcamDet.camera_id), LogLevel.INFO, DetType.WEBCAMDET
             )
 
     def update_models(self, det_type):
