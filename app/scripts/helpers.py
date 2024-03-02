@@ -55,3 +55,13 @@ def get_field(json, field):
     except Exception as err:
         (f"Unexpected Error: {err} of Type: {type(err)}")
         return ""
+
+
+def get_available_cameras():
+    available_cameras = []
+    for camera_id in range(10):  # Assuming maximum of 10 cameras
+        cap = cv2.VideoCapture(camera_id)
+        if cap.isOpened():
+            available_cameras.append(camera_id)
+            cap.release()
+    return available_cameras

@@ -20,9 +20,16 @@ from PyQt5.QtWidgets import (
 import app.classes as classes
 from app.classes.CustomLogger import logger
 from app.constants import paths
-from app.constants.types import DetType, Filetype, LogColor, LogLevel
+from app.constants.types import (
+    STYLESHEET_DISABLED,
+    STYLESHEET_ENABLED,
+    DetType,
+    Filetype,
+    LogColor,
+    LogLevel,
+)
 from app.qt import Ui_MainWindow
-from app.scripts.helpers import convert_cv_qt
+from app.scripts.helpers import convert_cv_qt, get_available_cameras
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -54,6 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.init_Params()
         self.init_userModels()
         self.init_ImageViewer()
+        self.init_cameras()
 
         self.update_FilesList()
         self.update_resultImgList()
@@ -72,44 +80,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_process.clicked.connect(self.process_image)
         self.ln_batchSize.editingFinished.connect(self.batchSize_changed)
         self.ln_outputDir.editingFinished.connect(
-            lambda i: self.outputDir_changed(DetType.IMAGEDET)
+            lambda i=None: self.outputDir_changed(DetType.IMAGEDET)
         )
         self.ln_threshhold.editingFinished.connect(
-            lambda i: self.threshhold_changed(DetType.IMAGEDET)
+            lambda i=None: self.threshhold_changed(DetType.IMAGEDET)
         )
         self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
         # Comboboxes
         self.combo_chooseDevice.currentIndexChanged.connect(
-            lambda i: self.device_changed(DetType.IMAGEDET)
+            lambda i=None: self.device_changed(DetType.IMAGEDET)
         )
         self.combo_api.currentIndexChanged.connect(
-            lambda i: self.api_changed(DetType.IMAGEDET)
+            lambda i=None: self.api_changed(DetType.IMAGEDET)
         )
         self.combo_model.currentIndexChanged.connect(
-            lambda i: self.model_changed(DetType.IMAGEDET)
+            lambda i=None: self.model_changed(DetType.IMAGEDET)
         )
         self.combo_collection.currentIndexChanged.connect(
-            lambda i: self.collection_changed(DetType.IMAGEDET)
+            lambda i=None: self.collection_changed(DetType.IMAGEDET)
         )
         self.combo_usrConfig.currentIndexChanged.connect(
-            lambda i: self.usrConfig_changed(DetType.IMAGEDET)
+            lambda i=None: self.usrConfig_changed(DetType.IMAGEDET)
         )
         self.combo_usrWeights.currentIndexChanged.connect(
-            lambda i: self.usrWeights_changed(DetType.IMAGEDET)
+            lambda i=None: self.usrWeights_changed(DetType.IMAGEDET)
         )
         self.combo_model.activated.connect(
-            lambda i: self.changeTo_MMDetModelMode(DetType.IMAGEDET)
+            lambda i=None: self.changeTo_MMDetModelMode(DetType.IMAGEDET)
         )
         self.combo_collection.activated.connect(
-            lambda i: self.changeTo_MMDetModelMode(DetType.IMAGEDET)
+            lambda i=None: self.changeTo_MMDetModelMode(DetType.IMAGEDET)
         )
         self.combo_usrConfig.activated.connect(
-            lambda i: self.changeTo_usrModelMode(DetType.IMAGEDET)
+            lambda i=None: self.changeTo_usrModelMode(DetType.IMAGEDET)
         )
         self.combo_usrWeights.activated.connect(
-            lambda i: self.changeTo_usrModelMode(DetType.IMAGEDET)
+            lambda i=None: self.changeTo_usrModelMode(DetType.IMAGEDET)
         )
 
         # change SizeAdjustPolicy to none instead of AdjustToContentsOnFirstShow
@@ -123,45 +131,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn_startWebcamDet_2.clicked.connect(self.start_webcam_det)
         self.btn_stopWebcamDet_2.clicked.connect(self.stop_webcam_det)
         self.combo_chooseDevice_2.currentIndexChanged.connect(
-            lambda i: self.device_changed(DetType.WEBCAMDET)
+            lambda i=None: self.device_changed(DetType.WEBCAMDET)
         )
         self.ln_threshhold_2.editingFinished.connect(
-            lambda i: self.threshhold_changed(DetType.WEBCAMDET)
+            lambda i=None: self.threshhold_changed(DetType.WEBCAMDET)
         )
         self.btn_uploadConfig_2.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights_2.clicked.connect(self.open_FileDialog_Weights)
         self.combo_api_2.currentIndexChanged.connect(
-            lambda i: self.api_changed(DetType.WEBCAMDET)
+            lambda i=None: self.api_changed(DetType.WEBCAMDET)
         )
         self.combo_model_2.currentIndexChanged.connect(
-            lambda I: self.model_changed(DetType.WEBCAMDET)
+            lambda i=None: self.model_changed(DetType.WEBCAMDET)
         )
         self.combo_usrConfig_2.currentIndexChanged.connect(
-            lambda I: self.usrConfig_changed(DetType.WEBCAMDET)
+            lambda i=None: self.usrConfig_changed(DetType.WEBCAMDET)
         )
         self.combo_usrWeights_2.currentIndexChanged.connect(
-            lambda i: self.usrWeights_changed(DetType.WEBCAMDET)
+            lambda i=None: self.usrWeights_changed(DetType.WEBCAMDET)
         )
         self.combo_collection_2.currentIndexChanged.connect(
-            lambda i: self.collection_changed(DetType.WEBCAMDET)
+            lambda i=None: self.collection_changed(DetType.WEBCAMDET)
         )
 
         self.combo_model_2.activated.connect(
-            lambda i: self.changeTo_MMDetModelMode(DetType.WEBCAMDET)
+            lambda i=None: self.changeTo_MMDetModelMode(DetType.WEBCAMDET)
         )
         self.combo_collection_2.activated.connect(
-            lambda i: self.changeTo_MMDetModelMode(DetType.WEBCAMDET)
+            lambda i=None: self.changeTo_MMDetModelMode(DetType.WEBCAMDET)
         )
         self.combo_usrConfig_2.activated.connect(
-            lambda i: self.changeTo_usrModelMode(DetType.WEBCAMDET)
+            lambda i=None: self.changeTo_usrModelMode(DetType.WEBCAMDET)
         )
         self.combo_usrWeights_2.activated.connect(
-            lambda i: self.changeTo_usrModelMode(DetType.WEBCAMDET)
+            lambda i=None: self.changeTo_usrModelMode(DetType.WEBCAMDET)
         )
+        self.combo_chooseCamera.currentIndexChanged.connect(self.camera_changed)
 
     def connectSignalsSlots_VideoDet(self):
         self.combo_chooseDevice_3.currentIndexChanged.connect(
-            lambda i: self.device_changed(DetType.VIDEODET)
+            lambda i=None: self.device_changed(DetType.VIDEODET)
         )
         pass
 
@@ -253,6 +262,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for c in self.modelHandler.usrConfigs:
                 combo.addItem(c)
             combo.setCurrentIndex(0)
+
+    def init_cameras(self):
+        available_cameras = get_available_cameras()
+        for c in available_cameras:
+            self.combo_chooseCamera.addItem(str(c))
 
     # init ImageViewer on Result Page
     def init_ImageViewer(self):
@@ -380,6 +394,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 f"Device changed to: " + det_object.device, LogLevel.INFO, det_type
             )
 
+    def camera_changed(self):
+        self.webcamDet.camera_id = int(self.combo_chooseCamera.currentText())
+        logger.log(
+                f"Camera Id chosen: " + self.webcamDet.camera_id, LogLevel.INFO, DetType.WEBCAMDET
+            )
+
     def update_models(self, det_type):
         combo_model = self.get_combo_model(det_type)
         det_object = self.get_det_object(det_type)
@@ -482,15 +502,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
 
     def api_changed(self, det_type):
-        if det_type == DetType.IMAGEDET:
-            self.imageDet.api = self.combo_api.currentText()
-        elif det_type == DetType.WEBCAMDET:
-            self.webcamDet.api = self.combo_api_2.currentText()
-        elif det_type == DetType.VIDEODET:
-            self.videoDet.api = self.combo_api_3.currentText()
-        logger.log(
-            f"API changed to {self.combo_api.currentText()}", LogLevel.DEBUG, det_type
-        )
+
+        combo_api = self.get_combo_api(det_type)
+        det_object = self.get_det_object(det_type)
+        if combo_api and det_object:
+            det_object.api = combo_api.currentText()
+            logger.log(
+                f"API changed to {combo_api.currentText()}",
+                LogLevel.INFO,
+                det_type,
+            )
+            if det_type == DetType.WEBCAMDET:
+                self.set_style_webcamDet()
+
+    def set_style_webcamDet(self):
+        qtObjects = [
+            self.combo_collection_2,
+            self.combo_model_2,
+            self.combo_usrConfig_2,
+            self.combo_usrWeights_2,
+            self.ln_threshhold_2,
+        ]
+        for q in qtObjects:
+            if self.webcamDet.api == "TechVidvan":
+                q.setStyleSheet(STYLESHEET_DISABLED)
+            else:
+                q.setStyleSheet(STYLESHEET_ENABLED)
+                if self.webcamDet.usrModelMode:
+                    self.combo_collection_2.setStyleSheet(STYLESHEET_DISABLED)
+                    self.combo_model_2.setStyleSheet(STYLESHEET_DISABLED)
+                else:
+                    self.combo_usrConfig_2.setStyleSheet(STYLESHEET_DISABLED)
+                    self.combo_usrWeights_2(STYLESHEET_DISABLED)
 
     def batchSize_changed(self, det_type):
         if det_type == DetType.IMAGEDET:
@@ -670,16 +713,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             if det_object is not None and not det_object.usrModelMode:
                 det_object.usrModelMode = True
-                combo_collection.setStyleSheet(
-                    "color: rgba(255, 255, 255, 0.3); \
-                                                    border: 1px solid rgba(255, 255, 255, 0.12);"
-                )
-                combo_model.setStyleSheet(
-                    "color: rgba(255, 255, 255, 0.3); \
-                                                border: 1px solid rgba(255, 255, 255, 0.12);"
-                )
-                combo_config.setStyleSheet("")
-                combo_checkpoint.setStyleSheet("")
+                combo_collection.setStyleSheet(STYLESHEET_DISABLED)
+                combo_model.setStyleSheet(STYLESHEET_DISABLED)
+                combo_config.setStyleSheet(STYLESHEET_ENABLED)
+                combo_checkpoint.setStyleSheet(STYLESHEET_ENABLED)
 
                 self.usrConfig_changed(det_type)
                 self.usrWeights_changed(det_type)
@@ -700,16 +737,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             if det_object is not None and det_object.usrModelMode:
                 det_object.usrModelMode = False
-                combo_config.setStyleSheet(
-                    "color: rgba(255, 255, 255, 0.3); \
-                                                    border: 1px solid rgba(255, 255, 255, 0.12);"
-                )
-                combo_checkpoint.setStyleSheet(
-                    "color: rgba(255, 255, 255, 0.3); \
-                                                    border: 1px solid rgba(255, 255, 255, 0.12);"
-                )
-                combo_collection.setStyleSheet("")
-                combo_model.setStyleSheet("")
+                combo_config.setStyleSheet(STYLESHEET_DISABLED)
+                combo_checkpoint.setStyleSheet(STYLESHEET_DISABLED)
+                combo_collection.setStyleSheet(STYLESHEET_ENABLED)
+                combo_model.setStyleSheet(STYLESHEET_ENABLED)
 
                 self.model_changed(det_type)
                 self.collection_changed(det_type)
@@ -806,3 +837,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return self.tb_modelInfo_2
         elif det_type == DetType.VIDEODET:
             return self.tb_modelInfo_3
+
+    def get_combo_api(self, det_type):
+        if det_type == DetType.IMAGEDET:
+            return self.combo_api
+        elif det_type == DetType.WEBCAMDET:
+            return self.combo_api_2
+        elif det_type == DetType.VIDEODET:
+            return self.combo_api_3

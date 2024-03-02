@@ -17,14 +17,14 @@ class FileDialog(QDialog):
         self.title = "PyQt5 file dialogs - pythonspot.com"
         self.left = 10
         self.top = 10
-        self.width = 640
-        self.height = 480
+        self.w = 640
+        self.h = 480
         self.type = type
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setGeometry(self.left, self.top, self.w, self.h)
 
         self.openFileNamesDialog()
 

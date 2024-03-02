@@ -27,3 +27,10 @@ class DetType(Enum):
     IMAGEDET = "Image Detection"
     WEBCAMDET = "Webcam Detection"
     VIDEODET = "Video Detection"
+
+
+STYLESHEET_DISABLED = (
+    "color: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.12);"
+)
+
+STYLESHEET_ENABLED = ""

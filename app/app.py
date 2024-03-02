@@ -2,6 +2,7 @@ import ctypes
 import os
 import sys
 
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
 # get the current working directory and add to the system path
@@ -25,6 +26,12 @@ user32.SetProcessDPIAware()
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
+
+    # the code to start to create and start a timer every 100 milliseconds.
+    # This way we can safely terminate our application with Ctrl-C from the command line.
+    timer = QTimer()
+    timer.timeout.connect(lambda: None)
+    timer.start(100)
 
     win = MainWindow()
     win.resize(w, h - 50)

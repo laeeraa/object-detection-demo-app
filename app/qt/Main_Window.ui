@@ -365,7 +365,7 @@ QPushButton {
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -607,7 +607,8 @@ p, li { white-space: pre-wrap; }
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">color: rgba(255, 255, 255, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.12);</string>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -651,10 +652,8 @@ p, li { white-space: pre-wrap; }
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">.disabled {
-		color: rgba(255, 255, 255, 0.3); 
-		border: 1px solid rgba(255, 255, 255, 0.12); 
-}</string>
+           <string notr="true">color: rgba(255, 255, 255, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.12);</string>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -1060,8 +1059,7 @@ border: none;
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: rgba(255, 255, 255, 0.3);
-border: 1px solid rgba(255, 255, 255, 0.12);</string>
+           <string notr="true"/>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -1237,8 +1235,7 @@ border: 1px solid rgba(255, 255, 255, 0.12);</string>
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: rgba(255, 255, 255, 0.3);
-border: 1px solid rgba(255, 255, 255, 0.12);</string>
+           <string notr="true"/>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -1626,7 +1623,8 @@ border: 1px solid rgba(255, 255, 255, 0.12);</string>
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">color: rgba(255, 255, 255, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.12);</string>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -1689,6 +1687,10 @@ border: none;
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgba(255, 255, 255, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.12);</string>
+          </property>
           <property name="text">
            <string>0.3</string>
           </property>
@@ -1728,10 +1730,8 @@ border: none;
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">.disabled {
-		color: rgba(255, 255, 255, 0.3); 
-		border: 1px solid rgba(255, 255, 255, 0.12); 
-}</string>
+           <string notr="true">color: rgba(255, 255, 255, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.12);</string>
           </property>
           <property name="editable">
            <bool>false</bool>

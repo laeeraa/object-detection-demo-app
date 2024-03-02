@@ -17,13 +17,14 @@ from app.constants.types import DetType, LogLevel
 class VideoDetThread_OpenMMLab(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
-    def __init__(self, parent, stopEvent, stopCallback):
+    def __init__(self, parent, stopEvent, camera_id, stopCallback):
         self.device = parent.device
         self.model = parent.model
         self.score_thr = parent.score_thr
         self.stopEvent = stopEvent
         self.palette = parent.palette
         self.usrModelMode = parent.usrModelMode
+        self.camera_id = camera_id
         super().__init__()
         self.stopCallback = stopCallback
 
@@ -49,7 +50,7 @@ class VideoDetThread_OpenMMLab(QThread):
             # then pass to the model in init_detector
             # visualizer.dataset_meta = model.dataset_meta
 
-            camera = cv2.VideoCapture(0)
+            camera = cv2.VideoCapture(self.camera_id)
         except Exception as e:
             logger.log(e, LogLevel.ERROR, DetType.WEBCAMDET)
             return

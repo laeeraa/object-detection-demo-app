@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from app.constants.types import DetType, LogLevel
+from app.constants.types import LogLevel
 
 
 class LoggerEmitter(QObject):
