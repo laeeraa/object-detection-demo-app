@@ -17,7 +17,7 @@ from app.constants.types import DetType, LogLevel
 class VideoDetThread_OpenMMLab(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
-    def __init__(self, parent, stopEvent):
+    def __init__(self, parent, stopEvent, stopCallback):
         self.device = parent.device
         self.model = parent.model
         self.score_thr = parent.score_thr
@@ -25,6 +25,7 @@ class VideoDetThread_OpenMMLab(QThread):
         self.palette = parent.palette
         self.usrModelMode = parent.usrModelMode
         super().__init__()
+        self.stopCallback = stopCallback
 
     def run(self):
         # build the model from a config file and a checkpoint file
@@ -55,29 +56,34 @@ class VideoDetThread_OpenMMLab(QThread):
         else:
             logger.log("Detector set up successfully", LogLevel.INFO, DetType.WEBCAMDET)
         while True:
-            ret_val, img = camera.read()
+            ret_val, frame = camera.read()
+
+            frame = cv2.flip(frame, 1)
+            framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
             try:
-                result = inference_detector(inferencer.model, img)
+                result = inference_detector(inferencer.model, frame)
             except Exception as e:
                 logger.log(e, LogLevel.ERROR, DetType.WEBCAMDET)
                 return
-            img = mmcv.imconvert(img, "bgr", "rgb")
+            # frame = mmcv.imconvert(frame, "bgr", "rgb")
             visualizer.add_datasample(
                 name="result",
-                image=img,
+                image=framergb,
                 data_sample=result,
                 draw_gt=False,
                 pred_score_thr=self.score_thr,
                 show=False,
             )
 
-            img = visualizer.get_image()
-            img = mmcv.imconvert(img, "bgr", "rgb")
+            frame = visualizer.get_image()
+            framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             if ret_val:
-                self.change_pixmap_signal.emit(img)
+                self.change_pixmap_signal.emit(framergb)
 
             if self.stopEvent.is_set():
                 camera.release()
                 cv2.destroyAllWindows()
+                self.stopCallback()
                 break
