@@ -756,7 +756,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 self.usrConfig_changed(det_type)
                 self.usrWeights_changed(det_type)
-                logger.log("Swapped to User Model Mode", LogLevel.INFO)
+                logger.log("Swapped to User Model Mode", LogLevel.INFO, det_type)
         except Exception as e:
             logger.log(
                 "Something went wrong while swapping to UserModelMode:\n{err}",
@@ -821,7 +821,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             self.webcamDet.run(self)
         except Exception as err:
-            logger.log("{err}", LogLevel.ERROR, det_type)
+            logger.log(f"{err}", LogLevel.ERROR, det_type=DetType.WEBCAMDET)
 
     # Webcam
     @pyqtSlot(np.ndarray)

@@ -1,9 +1,11 @@
 import os
+import warnings
 
 import cv2
 import mmcv
 import numpy as np
 import torch
+from mmdet.apis.det_inferencer import DetInferencer
 from mmdet.apis.inference import inference_detector, init_detector
 from mmdet.registry import VISUALIZERS
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -25,31 +27,26 @@ class VideoDetThread_OpenMMLab(QThread):
         super().__init__()
 
     def run(self):
-
-        current_dir = os.getcwd()
-        mmdet_path = os.path.join(
-            current_dir, "app/packages/OpenMMLab/mmdetection-main/"
-        )
         # build the model from a config file and a checkpoint file
         device = torch.device(self.device)
         try:
             if self.usrModelMode:
-                model = init_detector(
-                    self.model.config, self.model.checkpoint, self.palette, device
-                )
-            else:
-                # Load config and weights from metafile. If `weights` is
-                # assigned, the weights defined in metafile will be ignored.
-                model = init_detector(
-                    config=mmdet_path + self.model.config,
+                inferencer = DetInferencer(
+                    model=self.model.config,
+                    weights=self.model.checkpoint,
                     palette=self.palette,
                     device=device,
                 )
-            # init visualizer
-            visualizer = VISUALIZERS.build(model.cfg.visualizer)
+            else:
+                inferencer = DetInferencer(
+                    model=self.model.name,
+                    palette=self.palette,
+                    device=device,
+                )
+            visualizer = inferencer.visualizer
             # the dataset_meta is loaded from the checkpoint and
             # then pass to the model in init_detector
-            visualizer.dataset_meta = model.dataset_meta
+            # visualizer.dataset_meta = model.dataset_meta
 
             camera = cv2.VideoCapture(0)
         except Exception as e:
@@ -60,7 +57,7 @@ class VideoDetThread_OpenMMLab(QThread):
         while True:
             ret_val, img = camera.read()
             try:
-                result = inference_detector(model, img)
+                result = inference_detector(inferencer.model, img)
             except Exception as e:
                 logger.log(e, LogLevel.ERROR, DetType.WEBCAMDET)
                 return
