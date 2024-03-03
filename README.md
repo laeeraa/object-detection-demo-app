@@ -1,5 +1,6 @@
 # PyQT Desktop-App for Object Detection using OpenMMLab
-This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images and videos. 
+This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images the live Webcam.
+
 
 ## Setting up
 ### Setup Anaconda Environment Windows
@@ -27,7 +28,7 @@ conda activate ./env
 conda env update --file local.yml --prune
 ```
 
-##pip installs
+### pip installs
 ```bash
 #für Handgesture Recognizer
 pip install mediapipe 
