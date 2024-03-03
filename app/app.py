@@ -34,4 +34,5 @@ if __name__ == "__main__":
     win.resize(w, h)
     win.show()
 
+    #start application
     sys.exit(app.exec())
