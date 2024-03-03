@@ -18,3 +18,5 @@ __pycache__
 !.vscode/extensions.json 
 .history
 
+WindowsPowerShell/*
+
