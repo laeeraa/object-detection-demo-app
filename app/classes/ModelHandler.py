@@ -5,8 +5,10 @@ import torch
 import yaml
 
 from app.classes.Collection import Collection
+from app.classes.CustomLogger import logger
 from app.classes.Model import Model, Result
 from app.constants import paths
+from app.constants.types import LogLevel
 
 
 class Device:
@@ -31,9 +33,11 @@ class ModelHandler:
         self.init_deviceOptions()
 
     def getMMDetModels(self):
-        print(
+        logger.log(
             "Scanning Directory %s for collections and models ... "
-            % (paths.MMDET_MODELS)
+            % (paths.MMDET_MODELS),
+            LogLevel.DEBUG,
+            None,
         )
         for dir in os.scandir(paths.MMDET_MODELS):
             if dir.is_dir():
@@ -43,13 +47,15 @@ class ModelHandler:
                         coll = dir.name
                         if ext == ".yml":
                             self.parse_yml_file(file.path, coll)
-        print("...finished initializing collections and models")
 
     def get_UserModels(self):
         self.usrCheckpoints.clear()
         self.usrCheckpoints.clear()
-        print(
-            "Scanning Directory %s for and Configs & Weights ... " % (paths.USER_MODELS)
+        logger.log(
+            "Scanning Directory %s for and Configs & Weights ... "
+            % (paths.USER_MODELS),
+            LogLevel.DEBUG,
+            None,
         )
         for dir in os.scandir(paths.USER_MODELS):
             if dir.is_dir() and dir.name == "checkpoints":
@@ -60,7 +66,6 @@ class ModelHandler:
                 for file in os.scandir(dir.path):
                     if file.is_file():
                         self.usrConfigs.append(file.name)
-        print("...finished initializing User Configs and Checkpoints")
 
     def parse_yml_file(self, ymlFile, dir):
         with open(ymlFile) as f:

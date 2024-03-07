@@ -5,6 +5,9 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 
+from app.classes.CustomLogger import logger
+from app.constants.types import LogLevel
+
 
 def convert_cv_qt(cv_img, height=400, width=600):
     """Convert from an opencv image to QPixmap"""
@@ -59,7 +62,8 @@ def get_field(json, field):
 
 def get_available_cameras():
     available_cameras = []
-    for camera_id in range(10):  # Assuming maximum of 10 cameras
+    logger.log("Checking for available cameras...", LogLevel.DEBUG, None)
+    for camera_id in range(3):  # Assuming maximum of 3 cameras
         cap = cv2.VideoCapture(camera_id)
         if cap.isOpened():
             available_cameras.append(camera_id)

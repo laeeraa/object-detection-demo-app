@@ -65,6 +65,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_FilesList()
         self.update_resultImgList()
+
+        # Start Tab currently not in use --> set to not visible
+        self.tabWidget.setTabVisible(0, False)
         logger.log("The MainWindow has been initialized", LogLevel.INFO)
 
     def connectSignalsSlots_Start(self):
@@ -126,6 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.combo_model.setSizeAdjustPolicy(5)
         self.combo_usrConfig.setSizeAdjustPolicy(5)
         self.combo_usrWeights.setSizeAdjustPolicy(5)
+        self.combo_chooseDevice.setSizeAdjustPolicy(5)
 
     def connectSignalsSlots_WebcamDet(self):
         self.btn_startWebcamDet_2.clicked.connect(self.start_webcam_det)
@@ -168,10 +172,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.combo_chooseCamera.currentIndexChanged.connect(self.camera_changed)
 
+        # change SizeAdjustPolicy to none instead of AdjustToContentsOnFirstShow
+        # so that it doesn't adjust once the stylesheet is changed
+        self.combo_collection_2.setSizeAdjustPolicy(5)
+        self.combo_model_2.setSizeAdjustPolicy(5)
+        self.combo_usrConfig_2.setSizeAdjustPolicy(5)
+        self.combo_usrWeights_2.setSizeAdjustPolicy(5)
+        self.combo_chooseDevice_2.setSizeAdjustPolicy(5)
+
     def connectSignalsSlots_VideoDet(self):
+        # Tab currently not in use --> set to not visible
+        self.tabWidget.setTabVisible(3, False)
+
         self.combo_chooseDevice_3.currentIndexChanged.connect(
             lambda i=None: self.device_changed(DetType.VIDEODET)
         )
+        self.combo_collection_3.setSizeAdjustPolicy(5)
+        self.combo_model_3.setSizeAdjustPolicy(5)
+        self.combo_usrConfig_3.setSizeAdjustPolicy(5)
+        self.combo_usrWeights_3.setSizeAdjustPolicy(5)
         pass
 
     def connectSignalsSlots_Results(self):
@@ -397,8 +416,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def camera_changed(self):
         self.webcamDet.camera_id = int(self.combo_chooseCamera.currentText())
         logger.log(
-                f"Camera Id chosen: " + str(self.webcamDet.camera_id), LogLevel.INFO, DetType.WEBCAMDET
-            )
+            f"Camera Id chosen: " + str(self.webcamDet.camera_id),
+            LogLevel.INFO,
+            DetType.WEBCAMDET,
+        )
 
     def update_models(self, det_type):
         combo_model = self.get_combo_model(det_type)
