@@ -79,15 +79,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Btn_WebcamDet.setIcon(QIcon("./app/assets/webcam1.png"))
 
     def connectSignalsSlots_ImageDet(self):
-        self.list_filenames.itemDoubleClicked.connect(self.displayImageOrig)
+        self.list_filenames.itemDoubleClicked.connect(self.display_ImageOrig)
         self.btn_process.clicked.connect(self.process_image)
-        self.ln_batchSize.editingFinished.connect(self.batchSize_changed)
+        self.ln_batchSize.editingFinished.connect(
+            lambda i=None: self.batchSize_changed(DetType.IMAGEDET)
+        )
         self.ln_outputDir.editingFinished.connect(
             lambda i=None: self.outputDir_changed(DetType.IMAGEDET)
         )
         self.ln_threshhold.editingFinished.connect(
             lambda i=None: self.threshhold_changed(DetType.IMAGEDET)
         )
+        self.btn_addImage.clicked.connect(self.open_FileDialog_Image)
         self.btn_uploadConfig.clicked.connect(self.open_FileDialog_Configs)
         self.btn_uploadWeights.clicked.connect(self.open_FileDialog_Weights)
 
@@ -292,9 +295,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.qGScene = QGraphicsScene()
         self.qGItemGrp = QGraphicsItemGroup()
 
-        qGView = QGraphicsView()
-        qGView.setScene(self.qGScene)
-        self.box_imageRes.addWidget(qGView, 1)
+        self.qGView = QGraphicsView()
+        self.qGView.setScene(self.qGScene)
+        self.box_imageRes.addWidget(self.qGView, 1)
         qSlider = QSlider(Qt.Horizontal)
         qSlider.setRange(-100, 100)
         self.box_imageRes.addWidget(qSlider)
@@ -303,12 +306,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # update ResultImage on Result Page
     def update_result_image(self, image_path):
         self.qGScene.clear()
-        self.qGItemGrp = QGraphicsItemGroup()
-        qImg = QImage(image_path).scaledToWidth(600)
-        qGItemImg = QGraphicsPixmapItem(QPixmap.fromImage(qImg))
-        qGItemImg.setTransform(
-            QTransform().translate(-0.5 * qImg.width(), -0.5 * qImg.height())
+        # set scrollbar back to default
+        self.qGView.verticalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
         )
+        self.qGView.horizontalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
+        )
+        self.qGItemGrp = QGraphicsItemGroup()
+        qImg = QImage(image_path)
+        qGItemImg = QGraphicsPixmapItem(
+            QPixmap.fromImage(
+                qImg.scaledToWidth(
+                    self.box_imageRes.geometry().width(), Qt.SmoothTransformation
+                )
+            )
+        )
+        # qGItemImg.setTransform(
+        #     QTransform().translate(-0.5 * qImg.width(), -0.5 * qImg.height())
+        # )
         self.qGItemGrp.addToGroup(qGItemImg)
         self.qGScene.addItem(self.qGItemGrp)
 
@@ -640,10 +656,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for filename in dir.entryList():
             self.list_resultDir.addItem(filename)
 
-    def displayImageOrig(self):
+    def display_ImageOrig(self):
         path = paths.IMAGES + self.list_filenames.currentItem().text()
         im_cv = cv2.imread(path, cv2.IMREAD_ANYCOLOR)
-        self.lb_image_orig.setPixmap(convert_cv_qt(im_cv))
+        w = self.lb_image_orig.width()
+        h = self.lb_image_orig.height()
+        self.lb_image_orig.setPixmap(convert_cv_qt(im_cv, h, w))
 
     def list_resImages_event(self):
         path_img = paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
@@ -792,7 +810,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot(np.ndarray)
     def update_image_det(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        qt_img = convert_cv_qt(cv_img)
+        w = self.lb_webcamDet_2.width()
+        h = self.lb_webcamDet_2.height()
+        qt_img = convert_cv_qt(cv_img, h, w)
         self.lb_webcamDet_2.setPixmap(qt_img)
 
     def get_det_object(self, det_type):

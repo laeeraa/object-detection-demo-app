@@ -5,6 +5,7 @@ import shutil
 
 from PyQt5.QtWidgets import QDialog, QFileDialog
 
+from app.classes.CustomLogger import logger
 from app.constants import paths
 from app.constants.types import Filetype, LogLevel
 
@@ -52,16 +53,16 @@ class FileDialog(QDialog):
 
         # called when open button is pushed in file dialog
         if files:
-            self.parent.logger.log("Adding files to data directory...", LogLevel.INFO)
+            logger.log("Adding files to data directory...", LogLevel.INFO)
             try:
                 for f in files:
                     shutil.copy2(f, copyTo)
                 self.done(1)
                 self.parent.update_FilesList()
-                self.parent.logger.log("Added files to data directory", LogLevel.INFO)
+                logger.log("Added files to data directory", LogLevel.INFO)
                 return 0
             except Exception as e:
-                self.parent.logger.log(
+                logger.log(
                     f"Something went wrong copying the files into the specified directory {copyTo}\n Error: {e}",
                     LogLevel.ERROR,
                 )
