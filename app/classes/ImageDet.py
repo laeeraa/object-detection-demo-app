@@ -9,6 +9,8 @@ class ImageDet(ObjectDet):
         super().__init__()
 
     def process(self, image_path):
+        if self.api == None or self.model == None:
+            return (-1, "No Model chosen")
         if self.api != None and self.model.name != "":
             if self.api == "OpenMMLab":
                 return self.processImage_OpenMMLab(image_path)

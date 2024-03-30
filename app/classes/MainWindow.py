@@ -80,7 +80,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def connectSignalsSlots_ImageDet(self):
         self.list_filenames.itemDoubleClicked.connect(self.display_ImageOrig)
-        self.btn_process.clicked.connect(self.process_image)
+        self.btn_process.clicked.connect(
+            lambda i=None: self.process_image(DetType.IMAGEDET))
         self.ln_batchSize.editingFinished.connect(
             lambda i=None: self.batchSize_changed(DetType.IMAGEDET)
         )
@@ -298,6 +299,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.qGView = QGraphicsView()
         self.qGView.setScene(self.qGScene)
         self.box_imageRes.addWidget(self.qGView, 1)
+
+        self.qGView.verticalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
+        )
+        self.qGView.horizontalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
+        )
         qSlider = QSlider(Qt.Horizontal)
         qSlider.setRange(-100, 100)
         self.box_imageRes.addWidget(qSlider)
@@ -307,12 +315,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update_result_image(self, image_path):
         self.qGScene.clear()
         # set scrollbar back to default
-        self.qGView.verticalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
-        self.qGView.horizontalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
         self.qGItemGrp = QGraphicsItemGroup()
         qImg = QImage(image_path)
         qGItemImg = QGraphicsPixmapItem(
@@ -327,6 +329,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # )
         self.qGItemGrp.addToGroup(qGItemImg)
         self.qGScene.addItem(self.qGItemGrp)
+
+        self.qGView.verticalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
+        )
+        self.qGView.horizontalScrollBar().setSliderPosition(
+            int(self.qGView.verticalScrollBar().minimum())
+        )
 
     def scale_image(self, value):
         exp = value * 0.01
@@ -735,8 +744,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
         )
         logger.log("displaying result image at " + path, LogLevel.DEBUG)
-        self.update_result_image(path)
         self.tabWidget.setCurrentIndex(4)
+        self.update_result_image(path)
 
     def open_image_dialog(self):
         Imagedialog = classes.ImageLarge(self)

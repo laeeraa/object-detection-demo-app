@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from app.constants.types import LogLevel
+from app.constants.types import DetType, LogLevel
 
 
 class LoggerEmitter(QObject):
@@ -34,12 +34,16 @@ class Logger:
         Returns:
         None
         """
+        if not det_type or not type(det_type) == DetType:
+            det_type = None
         message = f"[{log_level.name}] [{det_type.value if det_type else ''}] {err}"
         if log_level.value > LogLevel.ERROR.value:
             message = f"Unexpected Error {err} of type: {type(err)}"
         if log_level.value >= self.level.value:
+            print("in here")
             self.signalEmitter.message_logged.emit(message, log_level, det_type)
         print(message)
+        print(det_type)
 
 
 logger = Logger(level=LogLevel.INFO)
