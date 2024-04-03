@@ -12,15 +12,15 @@ Convert newest Qt-Main-Window-File to python:
 `pyuic5 -o main_window_ui.py .\Main_Window.ui`
   
 Freeze anaconda environment:
-  `conda env export --no-builds > ./setup/env_linux.yml`
-# Some Examples
+`conda env export --no-builds > ./setup/env_linux.yml`
 
+# Some Demo Pictures: 
 
-![Alt text](./documentation/image-1.png)
-
-![Alt text](./documentation/image.png)
-
-![!\[Alt text\](image.png)](documentation/output-01.png)
+![alt text](documentation/runtime-pictures/ImageDetection-1.png)
+![alt text](documentation/runtime-pictures/ImageDetection-FileDialog.png)
+![alt text](documentation/runtime-pictures/results-2.png)
+![alt text](documentation/runtime-pictures/WebcamDetection-2.png)
+![alt text](documentation/runtime-pictures/WebcamDetection-TechVidvan.png)
 
 # Setting up
 ## 1. Install Miniconda3
@@ -96,6 +96,9 @@ python demo/image_demo.py demo/demo.jpg rtmdet-ins-s --show --device cpu
 ```
 
 If everything worked fine you can now go pack to your root-directory 
-`cd ../../../..`
-and start the app 
+`cd ../../../..` and
+
+### start the app 
 `python app/app.py`
+
+

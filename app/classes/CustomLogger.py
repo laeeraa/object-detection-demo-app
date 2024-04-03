@@ -40,7 +40,6 @@ class Logger:
         if log_level.value > LogLevel.ERROR.value:
             message = f"Unexpected Error {err} of type: {type(err)}"
         if log_level.value >= self.level.value:
-            print("in here")
             self.signalEmitter.message_logged.emit(message, log_level, det_type)
         print(message)
         print(det_type)
