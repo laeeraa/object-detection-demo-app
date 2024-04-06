@@ -51,21 +51,18 @@ bash ~/miniconda.sh -b -p $HOME/miniconda
 curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -o miniconda.exe
 
 #Run Setup
+#don't forget to add miniconda to the Path-Variable when asked
 start .\miniconda.exe
 
 #delete setup again
 del miniconda.exe
 
-#ggf zur Path Variable hinzufügen:
-"c:\tools\miniconda3"
-"c:\tools\miniconda3\Scripts"
-
-#initialize anaconda in Command Line
+#initialize anaconda in Command Line (restart of cmd required before conda command is available) 
 conda init
 ```
 ## 2. Setup Environment
 ```
-conda env create -f ./setup/environment.yml --prefix ./env
+conda env create -f ./setup/env_windows.yml --prefix ./env
 conda activate ./env
 ```
 ### 3. Setup Packages
@@ -78,11 +75,8 @@ unzip -d ./app/packages/ ./setup/packages/Hand_Gesture_Recognizer.zip
 ```
 ### On Windows: 
 ```
+Expand-Archive ./setup/packages/Hand_Gesture_Recognizer.zip -DestinationPath ./app/packages/
 Expand-Archive ./setup/packages/mmdetection.zip -DestinationPath ./app/packages/OpenMMLab
-
-#brauchts vermutlich nicht
-pip install -U openmim
-mim install mmengine
 mim install "mmcv==2.0.0"
 ```
 ### Continue for all platforms: 
