@@ -65,6 +65,11 @@ conda init
 conda env create -f ./setup/env_windows.yml --prefix ./env
 conda activate ./env
 ```
+### 3. Setup CUDA 
+ONLY AVAILABLE if a NVIDIA GPU is available   
+follow Tutorial on: https://medium.com/@harunijaz/a-step-by-step-guide-to-installing-cuda-with-pytorch-in-conda-on-windows-verifying-via-console-9ba4cd5ccbef and install for the recently created environment
+
+
 ### 3. Setup Packages
 ### On Linux: 
 ```
@@ -85,8 +90,11 @@ mim install "mmcv==2.0.0"
 cd ./app/packages/OpenMMLab/mmdetection-main
 pip install -v -e .
 
-#Verify Installation of mmdetection
+#Verify Installation of mmdetection if no cuda available
 python demo/image_demo.py demo/demo.jpg rtmdet-ins-s --show --device cpu
+
+#Verifying Installation of mmdetection with cuda enabled:
+python demo/image_demo.py demo/demo.jpg rtmdet-ins-s --show
 ```
 
 If everything worked fine you can now go pack to your root-directory 
