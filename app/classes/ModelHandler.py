@@ -118,14 +118,17 @@ class ModelHandler:
         return None
 
     def init_deviceOptions(self):
-        # get CPU Name
+        # get CPU device
         device = Device(cpuinfo.get_cpu_info()["brand_raw"], "cpu")
         self.devices.append(device)  # get only the brand name
 
         # get Cudadevices
         for i in range(torch.cuda.device_count()):
-            inference_str = "cuda:" + i
-            print("Cuda:" + i + "\t" + torch.cuda.get_device_properties(i).name)
+            inference_str = "cuda:" + str(i)
+            logger.log(
+                "Cuda device found:" + torch.cuda.get_device_properties(i).name,
+                log_level=LogLevel.DEBUG,
+            )
             device = Device(
                 torch.cuda.get_device_properties(i).name,
                 inference_str,
