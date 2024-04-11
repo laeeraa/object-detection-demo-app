@@ -66,7 +66,7 @@ conda env create -f ./setup/env_windows.yml --prefix ./env
 conda activate ./env
 ```
 ### 3. Setup CUDA 
-ONLY AVAILABLE if a NVIDIA GPU is available   
+ONLY if a NVIDIA GPU is available   
 follow Tutorial on: https://medium.com/@harunijaz/a-step-by-step-guide-to-installing-cuda-with-pytorch-in-conda-on-windows-verifying-via-console-9ba4cd5ccbef and install for the recently created environment
 
 
@@ -97,7 +97,7 @@ python demo/image_demo.py demo/demo.jpg rtmdet-ins-s --show --device cpu
 python demo/image_demo.py demo/demo.jpg rtmdet-ins-s --show
 ```
 
-If everything worked fine you can now go pack to your root-directory 
+If everything worked fine you can now go back to your root-directory 
 `cd ../../../..` and
 
 ### start the app 
