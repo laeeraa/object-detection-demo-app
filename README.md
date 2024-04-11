@@ -1,6 +1,9 @@
-# PyQT Desktop-App for Object Detection using OpenMMLab
+# PyQT Desktop-App for simple use of object detection models
 
-This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images and videos.
+This Desktop-App can be used to test and evaluate different neuronal networks with the purpose for object detection on images and webcam-data.
+It uses the OpenMMLab package MMDet and other Frameworks such as Tensorflow and OpenCV. 
+An academic report can be found the documentation folder. 
+
 # Start Commands
 Start App: 
 `python .\app\app.py`
