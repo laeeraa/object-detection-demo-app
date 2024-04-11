@@ -64,8 +64,9 @@ def get_available_cameras():
     available_cameras = []
     logger.log("Checking for available cameras...", LogLevel.DEBUG, None)
     for camera_id in range(3):  # Assuming maximum of 3 cameras
-        cap = cv2.VideoCapture(camera_id)
+        cap = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
         if cap.isOpened():
             available_cameras.append(camera_id)
             cap.release()
+    logger.log("Finished checking for available cameras", LogLevel.DEBUG, None)
     return available_cameras
