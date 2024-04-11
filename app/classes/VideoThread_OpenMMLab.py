@@ -50,7 +50,7 @@ class VideoDetThread_OpenMMLab(QThread):
             # then pass to the model in init_detector
             # visualizer.dataset_meta = model.dataset_meta
 
-            camera = cv2.VideoCapture(self.camera_id)
+            camera = cv2.VideoCapture(self.camera_id, cv2.CAP_DSHOW)
         except Exception as e:
             logger.log(e, LogLevel.ERROR, DetType.WEBCAMDET)
             return
