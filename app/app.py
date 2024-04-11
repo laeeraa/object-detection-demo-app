@@ -13,6 +13,8 @@ if current_working_directory not in sys.path:
 
 from app.classes.MainWindow import MainWindow
 
+# to make cuda work
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 if __name__ == "__main__":
 
