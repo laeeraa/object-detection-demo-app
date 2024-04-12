@@ -25,6 +25,9 @@ Freeze anaconda environment:
 ![alt text](documentation/runtime-pictures/WebcamDetection-2.png)
 ![alt text](documentation/runtime-pictures/WebcamDetection-TechVidvan.png)
 
+A video demo can be found here:   
+https://1drv.ms/f/s!AjYAChL9LPz-hJQS4pHEGN7Soy8-PA?e=upWvPh 
+
 # Setting up
 ## 1. Install Miniconda3
 #### On Linux: 
@@ -63,10 +66,17 @@ del miniconda.exe
 #initialize anaconda in Command Line (restart of cmd required before conda command is available) 
 conda init
 ```
-## 2. Setup Environment
+## 2. Setup Environment for devices without an available CUDA-GPU: 
 ```
-conda env create -f ./setup/env_windows.yml --prefix ./env
+conda env create -f ./setup/env_cpu_only.yml --prefix ./env
 conda activate ./env
+
+pip install mmcv==2.0.0 -f https://download.openmmlab.com/mmcv/dist/cpu/torch2.0/index.html
+
+oder vllt geht auch: 
+pip install -U openmim
+mim install "mmcv==2.0.0"
+
 ```
 ### 3. Setup CUDA 
 ONLY if a NVIDIA GPU is available   
@@ -85,7 +95,6 @@ unzip -d ./app/packages/ ./setup/packages/Hand_Gesture_Recognizer.zip
 ```
 Expand-Archive ./setup/packages/Hand_Gesture_Recognizer.zip -DestinationPath ./app/packages/
 Expand-Archive ./setup/packages/mmdetection.zip -DestinationPath ./app/packages/OpenMMLab
-mim install "mmcv==2.0.0"
 ```
 ### Continue for all platforms: 
 ```bash

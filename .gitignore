@@ -4,6 +4,7 @@ data/images/results/*
 #data/models/configs/*
 #data/models/checkpoints/*
 env/*
+env5/*
 
 # python build output #
 __pycache__

@@ -1,6 +1,5 @@
 name: object-detection-demo-app-master\env
 channels:
-  - pytorch
   - conda-forge
   - defaults
 dependencies:
@@ -11,13 +10,11 @@ dependencies:
   - certifi=2023.11.17
   - cffi=1.15.1
   - charset-normalizer=2.0.4
-  - cpuonly=2.0
   - cryptography=39.0.1
   - filelock=3.9.0
   - freetype=2.12.1
   - giflib=5.2.1
   - idna=3.4
-  - intel-openmp=2021.4.0
   - jinja2=3.1.2
   - jpeg=9e
   - lerc=3.0
@@ -49,13 +46,11 @@ dependencies:
   - pysocks=1.7.1
   - python=3.8.16
   - python_abi=3.8
-  - pytorch-mutex=1.0
   - six=1.16.0
   - sqlite=3.41.2
   - sympy=1.11.1
   - tbb=2021.5.0
   - tk=8.6.12
-  - torchvision=0.15.0
   - urllib3=1.26.15
   - vc=14.2
   - vs2015_runtime=14.27.29016
@@ -147,7 +142,6 @@ dependencies:
       - tensorboard-data-server==0.7.2
       - tensorflow==2.13.0
       - tensorflow-estimator==2.13.0
-      - tensorflow-intel==2.13.0
       - tensorflow-io-gcs-filesystem==0.31.0
       - termcolor==2.4.0
       - terminaltables==3.1.10
