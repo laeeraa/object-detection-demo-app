@@ -3,8 +3,6 @@
 `conda create --prefix ./env python=3.8`
 
 ## Setup Pytorch and Cuda properly: 
-https://medium.com/@harunijaz/a-step-by-step-guide-to-installing-cuda-with-pytorch-in-conda-on-windows-verifying-via-console-9ba4cd5ccbef 
-
 install pytorch 2.0.1 and cuda 11.8 on Windows: 
 ```
 conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia
@@ -32,11 +30,12 @@ pip install pyqt5-tools
 pip install py-cpuinfo
 pip install tensorflow
 pip install mediapipe
+pip install ninja
 ```
 
 ## Export environment
 Export full spec file: 
-`conda env export > ./setup/env.yml`
+`conda env export --no-builds > ./setup/env.yml`
 
 Export from history (cross-platform compatible):
 `conda env export --from-history > ./setup/env.yml`
