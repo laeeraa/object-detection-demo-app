@@ -20,6 +20,9 @@ install pytorch 2.0.1 without cuda available on Windows:
 conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 cpuonly -c pytorch 
 ```
 
+Guide on installing cuda properly: 
+https://medium.com/@harunijaz/a-step-by-step-guide-to-installing-cuda-with-pytorch-in-conda-on-windows-verifying-via-console-9ba4cd5ccbef
+
 ## Install additional packages: 
 ```
 pip install -U openmim
