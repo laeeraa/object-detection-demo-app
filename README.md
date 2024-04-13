@@ -66,21 +66,28 @@ del miniconda.exe
 #initialize anaconda in Command Line (restart of cmd required before conda command is available) 
 conda init
 ```
-## 2. Setup Environment for devices without an available CUDA-GPU: 
+### 2.0 Setup CUDA 
+ONLY if a NVIDIA GPU is available otherwise jump to next step 
+install cuda 11.8 from https://developer.nvidia.com/cuda-11-8-0-download-archive
+
+## 2. Setup Environment: 
+Setup Environment for devices without an available CUDA-GPU:
 ```
-conda env create -f ./setup/env_cpu_only.yml --prefix ./env
+conda env create -f ./setup/env_cpuonly.yml --prefix ./env
 conda activate ./env
 
-pip install mmcv==2.0.0 -f https://download.openmmlab.com/mmcv/dist/cpu/torch2.0/index.html
-
-oder vllt geht auch: 
-pip install -U openmim
+# install mmcv for mmdet framework
 mim install "mmcv==2.0.0"
-
 ```
-### 3. Setup CUDA 
-ONLY if a NVIDIA GPU is available   
-follow Tutorial on: https://medium.com/@harunijaz/a-step-by-step-guide-to-installing-cuda-with-pytorch-in-conda-on-windows-verifying-via-console-9ba4cd5ccbef and install for the recently created environment
+
+Setup Environment for Windows devices with CUDA 11.8 installed:
+```
+conda env create -f ./setup/env_windows_cuda.yml --prefix ./env
+conda activate ./env
+
+# install mmcv for mmdet framework
+mim install "mmcv==2.0.0"
+```
 
 
 ### 3. Setup Packages
