@@ -56,8 +56,8 @@ bash ~/miniconda.sh -b -p $HOME/miniconda
 #download SetUP:
 curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -o miniconda.exe
 
-#Run Setup
-#don't forget to add miniconda to the Path-Variable when asked
+# Run Setup
+# don't forget to add miniconda to the Path-Variable when asked
 start .\miniconda.exe
 
 #delete setup again
@@ -67,11 +67,11 @@ del miniconda.exe
 conda init
 ```
 ### 2.0 Setup CUDA 
-ONLY if a NVIDIA GPU is available otherwise jump to next step 
+ONLY if a NVIDIA GPU is available otherwise jump to next step  
 install cuda 11.8 from https://developer.nvidia.com/cuda-11-8-0-download-archive
 
 ## 2. Setup Environment: 
-Setup Environment for devices without an available CUDA-GPU:
+Setup Environment for Windows or Linux devices without an available CUDA-GPU:
 ```
 conda env create -f ./setup/env_cpuonly.yml --prefix ./env
 conda activate ./env
@@ -80,7 +80,7 @@ conda activate ./env
 mim install "mmcv==2.0.0"
 ```
 
-Setup Environment for Windows devices with CUDA 11.8 installed:
+Setup Environment for Windows or Linux devices with CUDA 11.8 installed:
 ```
 conda env create -f ./setup/env_windows_cuda.yml --prefix ./env
 conda activate ./env
