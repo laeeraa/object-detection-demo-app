@@ -89,6 +89,7 @@ conda activate ./env
 mim install "mmcv==2.0.0"
 ```
 
+... or follow the installation instructions at ./setup/SETUP.md
 
 ### 3. Setup Packages
 ### On Linux: 
