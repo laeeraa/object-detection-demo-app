@@ -3082,31 +3082,6 @@ border: 1px solid rgba(255, 255, 255, 0.12);</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" rowspan="4">
-         <layout class="QVBoxLayout" name="box_imageRes"/>
-        </item>
-        <item row="5" column="1">
-         <widget class="QPushButton" name="btn_openImageDialog">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Semilight</family>
-            <pointsize>12</pointsize>
-            <weight>99</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Open result in Dialog</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="2">
          <widget class="QTableWidget" name="tb_predictions">
           <property name="sizePolicy">
@@ -3139,6 +3114,35 @@ border: 1px solid rgba(255, 255, 255, 0.12);</string>
             <string>Labelclass</string>
            </property>
           </column>
+         </widget>
+        </item>
+        <item row="1" column="1" rowspan="4">
+         <layout class="QVBoxLayout" name="box_imageRes">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+         </layout>
+        </item>
+        <item row="5" column="1">
+         <widget class="QPushButton" name="btn_openImageDialog">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Semilight</family>
+            <pointsize>12</pointsize>
+            <weight>99</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Load Image</string>
+          </property>
          </widget>
         </item>
        </layout>

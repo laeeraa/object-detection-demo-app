@@ -200,7 +200,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def connectSignalsSlots_Results(self):
-        self.btn_openImageDialog.clicked.connect(self.open_image_dialog)
+        self.btn_openImageDialog.clicked.connect(self.list_resImages_event)
         self.list_resultDir.itemDoubleClicked.connect(self.list_resImages_event)
 
     # Init functions
@@ -731,11 +731,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 2,
                 QTableWidgetItem(r["labelclass"], 0),
             )
-
-    def open_image_dialog(self):
-        Imagedialog = classes.ImageLarge(self)
-        Imagedialog.setImage(self)
-        Imagedialog.exec()
 
     def changeTo_usrModelMode(self, det_type):
         combo_config = self.get_combo_usrConfig(det_type)
