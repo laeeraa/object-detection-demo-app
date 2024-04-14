@@ -8,6 +8,7 @@ __all__ = [
     "ModelHandler",
     "VideoThread_OpenMMLab",
     "CustomLogger",
+    "PhotoViewer"
 ]
 
 from .Collection import Collection
@@ -22,3 +23,4 @@ from .ObjectDet import ObjectDet
 from .VideoDet import VideoDet
 from .VideoThread_OpenMMLab import VideoDetThread_OpenMMLab
 from .WebcamDet import WebcamDet
+from .PhotoViewer import PhotoViewer

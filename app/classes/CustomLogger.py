@@ -42,7 +42,5 @@ class Logger:
         if log_level.value >= self.level.value:
             self.signalEmitter.message_logged.emit(message, log_level, det_type)
         print(message)
-        print(det_type)
-
 
 logger = Logger(level=LogLevel.INFO)

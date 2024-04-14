@@ -1,5 +1,8 @@
 import json
 
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
+from PyQt5 import QtCore
 import cv2
 import numpy as np
 from PyQt5.QtCore import QDir, Qt, pyqtSlot
@@ -45,13 +48,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
 
-        # connect signals of frontend events to the handler Functions
-        self.connectSignalsSlots_Start()
-        self.connectSignalsSlots_ImageDet()
-        self.connectSignalsSlots_WebcamDet()
-        self.connectSignalsSlots_Results()
-        self.connectSignalsSlots_VideoDet()
-
         logger.signalEmitter.message_logged.connect(self.update_log_window)
 
         self.init_modelOptions()
@@ -66,6 +62,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_FilesList()
         self.update_resultImgList()
 
+        # connect signals of frontend events to the handler Functions
+        self.connectSignalsSlots_Start()
+        self.connectSignalsSlots_ImageDet()
+        self.connectSignalsSlots_WebcamDet()
+        self.connectSignalsSlots_Results()
+        self.connectSignalsSlots_VideoDet()
         # Start Tab currently not in use --> set to not visible
         self.tabWidget.setTabVisible(0, False)
         logger.log("The MainWindow has been initialized", LogLevel.INFO)
@@ -292,55 +294,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.combo_chooseCamera.addItem(str(c))
 
     # init ImageViewer on Result Page
-    def init_ImageViewer(self):
-        self.qGScene = QGraphicsScene()
-        self.qGItemGrp = QGraphicsItemGroup()
+    def init_ImageViewer(self): 
+        self.viewer = classes.PhotoViewer(self)
+        # 'Load image' button
+        # self.btnLoad = QtWidgets.QToolButton(self)
+        # self.btnLoad.setText('Load image')
+        # self.btnLoad.clicked.connect(self.loadImage)
+        # Button to change from drag/pan to getting pixel info
+        self.btnPixInfo = QtWidgets.QToolButton(self)
+        self.btnPixInfo.setText('Enter pixel info mode')
+        self.btnPixInfo.clicked.connect(self.pixInfo)
+        self.editPixInfo = QtWidgets.QLineEdit(self)
+        self.editPixInfo.setReadOnly(True)
+        self.viewer.photoClicked.connect(self.photoClicked)
+        # Arrange layout
+        #VBlayout = QtWidgets.QVBoxLayout(self)
+        self.box_imageRes.addWidget(self.viewer)
+        HBlayout = QtWidgets.QHBoxLayout()
+        HBlayout.setAlignment(QtCore.Qt.AlignLeft)
+        # # HBlayout.addWidget(self.btnLoad)
+        HBlayout.addWidget(self.btnPixInfo)
+        HBlayout.addWidget(self.editPixInfo)
+        self.box_imageRes.addLayout(HBlayout)
 
-        self.qGView = QGraphicsView()
-        self.qGView.setScene(self.qGScene)
-        self.box_imageRes.addWidget(self.qGView, 1)
+        #self.update_result_image(r'C:\checkout\Studium_C\Studienprojekt\object-detection-demo-app\data\images\2.jpg')
 
-        self.qGView.verticalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
-        self.qGView.horizontalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
-        qSlider = QSlider(Qt.Horizontal)
-        qSlider.setRange(-100, 100)
-        self.box_imageRes.addWidget(qSlider)
-        qSlider.valueChanged.connect(self.scale_image)
-
-    # update ResultImage on Result Page
     def update_result_image(self, image_path):
-        self.qGScene.clear()
-        # set scrollbar back to default
-        self.qGItemGrp = QGraphicsItemGroup()
-        qImg = QImage(image_path)
-        qGItemImg = QGraphicsPixmapItem(
-            QPixmap.fromImage(
-                qImg.scaledToWidth(
-                    self.box_imageRes.geometry().width(), Qt.SmoothTransformation
-                )
-            )
-        )
-        # qGItemImg.setTransform(
-        #     QTransform().translate(-0.5 * qImg.width(), -0.5 * qImg.height())
-        # )
-        self.qGItemGrp.addToGroup(qGItemImg)
-        self.qGScene.addItem(self.qGItemGrp)
+        self.viewer.setPhoto(QtGui.QPixmap(image_path))
 
-        self.qGView.verticalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
-        self.qGView.horizontalScrollBar().setSliderPosition(
-            int(self.qGView.verticalScrollBar().minimum())
-        )
+    def pixInfo(self):
+        self.viewer.toggleDragMode()
 
-    def scale_image(self, value):
-        exp = value * 0.01
-        scl = 10.0**exp
-        self.qGItemGrp.setTransform(QTransform().scale(scl, scl))
+    def photoClicked(self, pos):
+        if self.viewer.dragMode()  == QtWidgets.QGraphicsView.NoDrag:
+            self.editPixInfo.setText('%d, %d' % (pos.x(), pos.y()))
 
     # update Functions
     def update_collection_table(self, det_type):
@@ -659,11 +646,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.list_resultDir.clear()
         path = paths.IMAGES_RES + "/vis/"
         dir = QDir(path)
-        # print(path)
         filters = ["*.jpg", "*.JPG"]
         dir.setNameFilters(filters)
         for filename in dir.entryList():
             self.list_resultDir.addItem(filename)
+        #self.list_resultDir.setCurrentRow(0)
 
     def display_ImageOrig(self):
         path = paths.IMAGES + self.list_filenames.currentItem().text()
@@ -673,6 +660,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lb_image_orig.setPixmap(convert_cv_qt(im_cv, h, w))
 
     def list_resImages_event(self):
+        if(int(self.list_resultDir.currentRow()) < 0): 
+            logger.log("No image selected", log_level=LogLevel.WARNING, det_type=DetType.IMAGEDET)
         path_img = paths.IMAGES_RES + "/vis/" + self.list_resultDir.currentItem().text()
         self.update_result_image(path_img)
         path_pred = (
@@ -689,8 +678,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def process_image(self, det_type=DetType.IMAGEDET):
         path = ""
+        name = self.list_filenames.currentItem().text()
         try:
-            path = paths.IMAGES + self.list_filenames.currentItem().text()
+            path = paths.IMAGES + name
         except Exception as err:
             logger.log(
                 "Specified Imagepath could not be read", LogLevel.WARNING, det_type
@@ -710,9 +700,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 LogLevel.DEBUG,
                 det_type,
             )
-            self.display_result_image()
-            self.update_prediction_table(ret[1])
+            path_res = paths.IMAGES_RES + "/vis/" + name
+            logger.log("displaying result image at " + path, LogLevel.DEBUG)
             self.update_resultImgList()
+            self.update_prediction_table(ret[1])
+            self.tabWidget.setCurrentIndex(4)
+            self.update_result_image(path_res)
+            
         else:
             logger.log("No objects detected", LogLevel.WARNING, det_type)
 
@@ -737,15 +731,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 2,
                 QTableWidgetItem(r["labelclass"], 0),
             )
-            self.update_resultImgList()
-
-    def display_result_image(self):
-        path = (
-            self.imageDet.out_dir + "/vis/" + self.list_filenames.currentItem().text()
-        )
-        logger.log("displaying result image at " + path, LogLevel.DEBUG)
-        self.tabWidget.setCurrentIndex(4)
-        self.update_result_image(path)
 
     def open_image_dialog(self):
         Imagedialog = classes.ImageLarge(self)
