@@ -45,11 +45,13 @@ init the command line
 ~/miniconda3/bin/conda init bash
 ~/miniconda3/bin/conda init zsh
 ```
+restart terminal window
 #### On MacOS 
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
 bash ~/miniconda.sh -b -p $HOME/miniconda
 ```
+restart terminal window
 #### On Windows
 
 ```bash
@@ -66,6 +68,7 @@ del miniconda.exe
 #initialize anaconda in Command Line (restart of cmd required before conda command is available) 
 conda init
 ```
+restart terminal window
 ### 2.0 Setup CUDA
 ONLY if a NVIDIA GPU is available otherwise jump to next step  
 #### 2.0.1 Install NVIDIA Driver
