@@ -66,14 +66,15 @@ del miniconda.exe
 #initialize anaconda in Command Line (restart of cmd required before conda command is available) 
 conda init
 ```
-### 2.0 Setup CUDA 11.8
+### 2.0 Setup CUDA
 ONLY if a NVIDIA GPU is available otherwise jump to next step  
 #### 2.0.1 Install NVIDIA Driver
 check for your NVIDIA GPU - Type in the Device manager and install the correct Driver from: https://www.nvidia.com/download/index.aspx  
+#### 2.0.2 Install Cuda 11.8
 install cuda 11.8 from https://developer.nvidia.com/cuda-11-8-0-download-archive
 
 ## 2. Setup Environment: 
-Setup Environment for Windows or Linux devices WITHOUT an available CUDA-GPU:
+### Setup Environment for Windows or Linux devices WITHOUT an available CUDA-GPU:
 ```
 conda env create -f ./setup/env_cpuonly.yml --prefix ./env
 conda activate ./env
@@ -82,7 +83,7 @@ conda activate ./env
 mim install "mmcv==2.0.0"
 ```
 
-Setup Environment for Windows or Linux devices with CUDA 11.8 installed:
+### Setup Environment for Windows or Linux devices with CUDA 11.8 installed:
 ```
 conda env create -f ./setup/env_windows_cuda.yml --prefix ./env
 conda activate ./env
